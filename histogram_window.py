@@ -2,7 +2,6 @@ from tkinter import Label, Toplevel
 from tkinter.constants import S
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from math import floor
 
 #Dodać dla kolorowych
 class NewHistogramWindow(Toplevel):
@@ -17,8 +16,8 @@ class NewHistogramWindow(Toplevel):
 
     def mouse_move(self, event):
         if event.xdata is not None:
-            self.xData.config(text=floor(event.xdata))
-            self.yData.config(text=self.image.lut[floor(event.xdata)])
+            self.xData.config(text=round(event.xdata))
+            self.yData.config(text=self.image.lut[round(event.xdata)])
 
 
     def create_hist_value_display(self):
@@ -36,7 +35,10 @@ class NewHistogramWindow(Toplevel):
 
     def update_histogram(self, image):
         p = self.f.gca()
-        p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
+        if image.isGrayScale:
+            p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
+        else:
+            pass
         p.axis([0, 255, 0, max(image.lut)])
         p.set_yticklabels([0, max(image.lut)])
         p.set_yticks([0, max(image.lut)])

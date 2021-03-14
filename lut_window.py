@@ -13,8 +13,12 @@ class NewLutWindow(Toplevel):
 
     def set_basic(self, image, name):
         self.image = image
-        self.geometry('400x100')
-        self.minsize(400, 100)
+        if image.isGrayScale:
+            self.geometry('400x100')
+            self.minsize(400, 100)
+        else:
+            self.geometry('400x200')
+            self.minsize(400, 200)
         self.maxsize(self.winfo_screenwidth(), 100)
         self.title("LUT {}".format(name))
         self.set_scrollbar()
@@ -40,10 +44,23 @@ class NewLutWindow(Toplevel):
         
 
     def display_lut_values(self, image):
-        Label(self.write_frame, text='Value: ', borderwidth=2, relief="raised", width=6, height=2).grid(row = 0, column=0)
-        Label(self.write_frame, text='Count: ', borderwidth=2, relief="raised", width=6, height=2).grid(row = 1, column=0)
-        for value,count in enumerate(image.lut):
-            Label(self.write_frame, text=value, borderwidth=2, relief="raised", width=5, height=2).grid(row=0, column=value+1)
-            Label(self.write_frame, text=count, borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
+        if image.isGrayScale:
+            Label(self.write_frame, text='Value: ', borderwidth=2, relief="raised", width=6, height=2, bg="gray").grid(row = 0, column=0)
+            Label(self.write_frame, text='Count: ', borderwidth=2, relief="raised", width=6, height=2).grid(row = 1, column=0)
+            for value,count in enumerate(image.lut):
+                Label(self.write_frame, text=value, borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value+1)
+                Label(self.write_frame, text=count, borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
+        else:
+            Label(self.write_frame, text='Value: ', borderwidth=2, relief="raised", width=10, height=2, bg="gray").grid(row = 0, column=0)
+            Label(self.write_frame, text='Count Red: ', borderwidth=2, relief="raised", width=10, height=2, bg='red').grid(row = 1, column=0)
+            Label(self.write_frame, text='Count Green: ', borderwidth=2, relief="raised", width=10, height=2, bg='green').grid(row = 2, column=0)
+            Label(self.write_frame, text='Count Blue: ', borderwidth=2, relief="raised", width=10, height=2, bg='blue').grid(row = 3, column=0)
+            Label(self.write_frame, text='Count Sum: ', borderwidth=2, relief="raised", width=10, height=2).grid(row = 4, column=0)
+            for value, count in enumerate(image.lut):
+                Label(self.write_frame, text=value, borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value+1)
+                Label(self.write_frame, text=int(count[0]), borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
+                Label(self.write_frame, text=int(count[1]), borderwidth=2, relief="raised", width=5, height=2).grid(row=2, column=value+1)
+                Label(self.write_frame, text=int(count[2]), borderwidth=2, relief="raised", width=5, height=2).grid(row=3, column=value+1)
+                Label(self.write_frame, text=int(sum(count)), borderwidth=2, relief="raised", width=5, height=2).grid(row=4, column=value+1)
 
         
