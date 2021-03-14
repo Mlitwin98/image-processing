@@ -1,7 +1,7 @@
 from tkinter import Canvas, Frame, Label
 from tkinter import Toplevel
 from tkinter import ttk
-from tkinter.constants import BOTH, BOTTOM, HORIZONTAL, LEFT, NE, SE, SW, X,  NW
+from tkinter.constants import BOTH, BOTTOM, HORIZONTAL, LEFT, X,  NW
 
 class NewLutWindow(Toplevel):
     def __init__(self, image, name, master = None): 
