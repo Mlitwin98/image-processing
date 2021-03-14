@@ -3,6 +3,7 @@ from tkinter import Toplevel
 from PIL import Image, ImageTk
 from image_saved import ImageSaved
 from histogram_window import NewHistogramWindow
+from lut_window import NewLutWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None): 
@@ -32,7 +33,7 @@ class NewImageWindow(Toplevel):
 
     def place_menu(self):
         self.top_menu = tk.Menu()
-        self.top_menu.add_command(label='LUT', compound=tk.LEFT)
+        self.top_menu.add_command(label='LUT', compound=tk.LEFT, command= lambda: NewLutWindow(self.image, self.name, self))
         self.top_menu.add_command(label='Histogram', compound=tk.LEFT, command= lambda: NewHistogramWindow(self.image, self.name, self))
         self.top_menu.add_command(label='Linia profilu', compound=tk.LEFT)
         self.top_menu.add_command(label='Linia profilu', compound=tk.LEFT)

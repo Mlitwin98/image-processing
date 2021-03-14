@@ -7,4 +7,3 @@ def import_image(root):
     if len(path) > 0:
         NewImageWindow(root, path, os.path.split(path)[1])        
     
-

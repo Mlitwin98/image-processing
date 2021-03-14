@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import Toplevel
-from tkinter.constants import DISABLED, NORMAL
 import matplotlib as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -37,13 +36,13 @@ class NewHistogramWindow(Toplevel):
         
 
     def update_histogram(self, image):
-        self.p = self.f.gca()
-        self.p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
-        self.p.axis([0, 256, 0, max(image.lut)])
-        self.p.set_yticklabels([0, max(image.lut)])
-        self.p.set_yticks([0, max(image.lut)])
-        self.p.set_xticklabels([0, 256])
-        self.p.set_xticks([0, 256])
+        p = self.f.gca()
+        p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
+        p.axis([0, 255, 0, max(image.lut)])
+        p.set_yticklabels([0, max(image.lut)])
+        p.set_yticks([0, max(image.lut)])
+        p.set_xticklabels([0, 255])
+        p.set_xticks([0, 255])
 
     def create_cavas(self):
         self.f = Figure(tight_layout=True)
