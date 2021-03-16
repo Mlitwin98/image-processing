@@ -2,6 +2,7 @@ from tkinter import Label, Toplevel
 from tkinter.constants import S
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from numpy import amax
 
 #Dodać dla kolorowych
 class NewHistogramWindow(Toplevel):
@@ -10,14 +11,19 @@ class NewHistogramWindow(Toplevel):
         self.set_basic(image, name)
 
         self.create_hist_value_display()  
-        self.create_cavas()        
-        self.update_histogram(image)
+        self.create_cavas()  
 
+        self.p = self.f.gca()      
+        self.update_histogram(image)
+        
 
     def mouse_move(self, event):
         if event.xdata is not None:
             self.xData.config(text=round(event.xdata))
-            self.yData.config(text=self.image.lut[round(event.xdata)])
+            if self.image.isGrayScale:
+                self.yData.config(text=self.image.lut[round(event.xdata)])
+            else:
+                self.yData.config(text="({}, {}, {})".format(int(self.image.lut[round(event.xdata)][0]), int(self.image.lut[round(event.xdata)][1]), int(self.image.lut[round(event.xdata)][2])))
 
 
     def create_hist_value_display(self):
@@ -28,22 +34,28 @@ class NewHistogramWindow(Toplevel):
 
 
         yLabel = Label(self.histogramPanel, text="Count:")
-        yLabel.place(relwidth=0.2, height=40, relx=0.5, rely=0.99, anchor=S)
+        yLabel.place(relwidth=0.15, height=40, relx=0.45, rely=0.99, anchor=S)
         self.yData = Label(self.histogramPanel, text='')
-        self.yData.place(relwidth = 0.1, height = 40, relx=0.6, rely=0.99, anchor=S)
+        self.yData.place(relwidth = 0.2, height = 40, relx=0.6, rely=0.99, anchor=S)
         
 
     def update_histogram(self, image):
-        p = self.f.gca()
         if image.isGrayScale:
-            p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
+            self.p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
         else:
-            pass
-        p.axis([0, 255, 0, max(image.lut)])
-        p.set_yticklabels([0, max(image.lut)])
-        p.set_yticks([0, max(image.lut)])
-        p.set_xticklabels([0, 255])
-        p.set_xticks([0, 255])
+            self.p.hist([i for i in range(256)], weights=image.lut[:,0], density=False, bins = [i for i in range(256)], color='red')
+            self.p.hist([i for i in range(256)], weights=image.lut[:,1], density=False, bins = [i for i in range(256)], color='green')
+            self.p.hist([i for i in range(256)], weights=image.lut[:,2], density=False, bins = [i for i in range(256)], color='blue')
+        self.set_axis()
+            
+        
+
+    def set_axis(self):
+        self.p.axis([0, 255, 0, int(amax(self.image.lut))])
+        self.p.set_yticklabels([0, int(amax(self.image.lut))])
+        self.p.set_yticks([0, int(amax(self.image.lut))])   
+        self.p.set_xticklabels([0, 255])
+        self.p.set_xticks([0, 255])
 
     def create_cavas(self):
         self.f = Figure(tight_layout=True)
