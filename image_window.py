@@ -10,6 +10,7 @@ class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None): 
         super().__init__(master = master)
 
+        self.profileWindow = None
         self.set_images(pathToImage)
         self.set_geometry()
         self.set_basic(master, pathToImage, name)
@@ -36,10 +37,11 @@ class NewImageWindow(Toplevel):
         self.topMenu = Menu()
         self.topMenu.add_command(label='LUT', compound=LEFT, command= lambda: NewLutWindow(self.image, self.name, self))
         self.topMenu.add_command(label='Histogram', compound=LEFT, command= lambda: NewHistogramWindow(self.image, self.name, self))
-        self.topMenu.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command= lambda: NewLineProfileWindow(self.image, self.name, self.lineCoords, [self.newWidth, self.newHeight], self))
+        self.topMenu.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command= lambda: self.create_profile_window())
         self.config(menu = self.topMenu)
 
     def bind_functions(self):
+        #Zmienić resize'owanie, aktualnie nie pasuje do linii profilu
         self.bind('<Configure>', self.resize_img)
         self.bind('<Control-d>', lambda event: NewImageWindow.duplicate_window(self.master, self.path, self.name + '(Kopia)'))
         self.bind("<ButtonPress-3>", self.click)
@@ -49,6 +51,9 @@ class NewImageWindow(Toplevel):
         self.image = ImageSaved(pathToImage)
         self.imageFromArray = Image.fromarray(self.image.cv2Image)
         self.imageCopy = self.imageFromArray.copy()
+
+    def create_profile_window(self):
+        self.profileWindow = NewLineProfileWindow(self.image, self.name, self.lineCoords, [self.newWidth, self.newHeight], self)
 
     def set_basic(self, master, pathToImage, name):
         self.focus_force()
@@ -74,3 +79,6 @@ class NewImageWindow(Toplevel):
         if self.line is not None:
             self.imagePanel.delete(self.line) 
         self.line = self.imagePanel.create_line(self.lineCoords["x"], self.lineCoords["y"], self.lineCoords['x2'], self.lineCoords['y2'], fill='red', dash=(2, 2))
+        
+        if self.profileWindow is not None:
+            self.profileWindow.update_line(self.lineCoords, self.image)
