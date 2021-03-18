@@ -4,16 +4,13 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from numpy import amax
 
-#Dodać dla kolorowych
 class NewHistogramWindow(Toplevel):
     def __init__(self, image, name, master = None): 
         super().__init__(master = master)
-        self.set_basic(image, name)
-
+        self.image=image
+        self.set_basic(name)
         self.create_hist_value_display()  
-        self.create_cavas()  
-
-        self.p = self.f.gca()      
+        self.set_figures()                
         self.update_histogram(image)
         
 
@@ -27,13 +24,13 @@ class NewHistogramWindow(Toplevel):
 
 
     def create_hist_value_display(self):
-        xLabel = Label(self.histogramPanel, text="Value:")
+        xLabel = Label(self.histogramPanel, text="Wartość:")
         xLabel.place(relwidth=0.2, height=40, relx=0.2, rely=0.99, anchor=S)
         self.xData = Label(self.histogramPanel, text='')
         self.xData.place(relwidth = 0.1, height = 40, relx=0.3, rely=0.99, anchor=S)
 
 
-        yLabel = Label(self.histogramPanel, text="Count:")
+        yLabel = Label(self.histogramPanel, text="Zliczenia:")
         yLabel.place(relwidth=0.15, height=40, relx=0.45, rely=0.99, anchor=S)
         self.yData = Label(self.histogramPanel, text='')
         self.yData.place(relwidth = 0.2, height = 40, relx=0.6, rely=0.99, anchor=S)
@@ -57,14 +54,14 @@ class NewHistogramWindow(Toplevel):
         self.p.set_xticklabels([0, 255])
         self.p.set_xticks([0, 255])
 
-    def create_cavas(self):
+    def set_figures(self):
         self.f = Figure(tight_layout=True)
+        self.p = self.f.gca()
         canvas = FigureCanvasTkAgg(self.f, master=self.histogramPanel)
         canvas.mpl_connect('motion_notify_event', self.mouse_move)
         canvas.get_tk_widget().place(relwidth=1, relheight = 0.9, x=0, y=0)
 
-    def set_basic(self, image, name):
-        self.image = image
+    def set_basic(self, name):
         self.histogramPanel = Label(self)
         self.histogramPanel.place(relwidth=1, relheight = 1, x=0, y=0)
         self.title("Histogram {}".format(name))
