@@ -7,11 +7,9 @@ class ImageSaved():
         self.isGrayScale = self.check_if_is_gray()
         if self.isGrayScale:
             self.cv2Image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-            self.lut = [0]*256
         else:
             self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
             self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
-            self.lut = np.zeros(shape=(256, 3))
 
         self.name = path
         self.size = self.cv2Image.size
@@ -26,15 +24,20 @@ class ImageSaved():
 
     def fill_histogram(self):
         if self.isGrayScale:
+            self.lut = np.zeros(shape=256).astype(int)
             h, w = self.cv2Image.shape
             for i in range(h):
                 for j in range(w):
                     self.lut[self.cv2Image[i][j]] += 1
         else:
+            self.lut = np.zeros(shape=(256, 3)).astype(int)
             h, w, c = self.cv2Image.shape
             for i in range(h):
                 for j in range(w):
                     for k in range(c):
                         self.lut[self.cv2Image[i][j][k], k] += 1        
 
-        
+    def negate(self):
+        maxVal = np.amax(self.cv2Image)
+        self.cv2Image = maxVal - self.cv2Image
+        self.fill_histogram()

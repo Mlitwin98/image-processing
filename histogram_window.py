@@ -37,13 +37,15 @@ class NewHistogramWindow(Toplevel):
         
 
     def update_histogram(self, image):
+        self.p.clear()
         if image.isGrayScale:
             self.p.hist([i for i in range(256)], weights=image.lut, density=False, bins = [i for i in range(256)], color='black')
         else:
-            self.p.hist([i for i in range(256)], weights=image.lut[:,0], density=False, bins = [i for i in range(256)], color='red')
-            self.p.hist([i for i in range(256)], weights=image.lut[:,1], density=False, bins = [i for i in range(256)], color='green')
-            self.p.hist([i for i in range(256)], weights=image.lut[:,2], density=False, bins = [i for i in range(256)], color='blue')
+            self.p.hist([i for i in range(256)], weights=image.lut[:,0], density=False, alpha=0.6, bins = [i for i in range(256)], color='red')
+            self.p.hist([i for i in range(256)], weights=image.lut[:,1], density=False, alpha=0.6, bins = [i for i in range(256)], color='green')
+            self.p.hist([i for i in range(256)], weights=image.lut[:,2], density=False, alpha=0.6, bins = [i for i in range(256)], color='blue')
         self.set_axis()
+        self.canvas.draw()
             
         
 
@@ -57,9 +59,9 @@ class NewHistogramWindow(Toplevel):
     def set_figures(self):
         self.f = Figure(tight_layout=True)
         self.p = self.f.gca()
-        canvas = FigureCanvasTkAgg(self.f, master=self.histogramPanel)
-        canvas.mpl_connect('motion_notify_event', self.mouse_move)
-        canvas.get_tk_widget().place(relwidth=1, relheight = 0.9, x=0, y=0)
+        self.canvas = FigureCanvasTkAgg(self.f, master=self.histogramPanel)
+        self.canvas.mpl_connect('motion_notify_event', self.mouse_move)
+        self.canvas.get_tk_widget().place(relwidth=1, relheight = 0.9, x=0, y=0)
 
     def set_basic(self, name):
         self.histogramPanel = Label(self)

@@ -58,9 +58,9 @@ class NewLutWindow(Toplevel):
             Label(self.write_frame, text='Suma: ', borderwidth=2, relief="raised", width=10, height=2).grid(row = 4, column=0)
             for value, count in enumerate(image.lut):
                 Label(self.write_frame, text=value, borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value+1)
-                Label(self.write_frame, text=int(count[0]), borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
-                Label(self.write_frame, text=int(count[1]), borderwidth=2, relief="raised", width=5, height=2).grid(row=2, column=value+1)
-                Label(self.write_frame, text=int(count[2]), borderwidth=2, relief="raised", width=5, height=2).grid(row=3, column=value+1)
-                Label(self.write_frame, text=int(sum(count)), borderwidth=2, relief="raised", width=5, height=2).grid(row=4, column=value+1)
+                Label(self.write_frame, text=count[0], borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
+                Label(self.write_frame, text=count[1], borderwidth=2, relief="raised", width=5, height=2).grid(row=2, column=value+1)
+                Label(self.write_frame, text=count[2], borderwidth=2, relief="raised", width=5, height=2).grid(row=3, column=value+1)
+                Label(self.write_frame, text=sum(count), borderwidth=2, relief="raised", width=5, height=2).grid(row=4, column=value+1)
 
         
