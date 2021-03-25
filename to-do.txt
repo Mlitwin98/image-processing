@@ -2,8 +2,10 @@ NOWE:
 1. Rozciąganie histogramu
 2. Wyrównywanie histogramu
 3. 
+----------          DODAĆ PROMPT DLA UŻYTKOWNIKA, 3 progi dla kolorowych?
 4. Progowanie
 5. Progowanie z zachowaniem poziomów szarości
+----------
 6. Redukcja poziomów szarości przez posteryzację
 7. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax. 
 

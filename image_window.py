@@ -10,8 +10,6 @@ class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None): 
         super().__init__(master = master)
 
-        self.profileWindow = None
-        self.histogramWindow = None
         self.pathToImage = pathToImage
         self.image = ImageSaved(pathToImage)
         self.set_images()
@@ -39,6 +37,10 @@ class NewImageWindow(Toplevel):
         self.imagePanel = Canvas(self)
         self.imagePanel.place(relwidth=1, relheight = 1, x=0, y=0)
 
+        self.profileWindow = None
+        self.histogramWindow = None
+        self.lutWindow = None
+
     
     def manage_line_profile(self):
         self.lineCoords = {"x":0,"y":0,"x2":0,"y2":0}
@@ -61,7 +63,7 @@ class NewImageWindow(Toplevel):
 
         self.dsc = Menu(topMenu, tearoff=False)
         self.dsc.add_command(label='Histogram', compound=LEFT, command= lambda: self.create_histogram_window())
-        self.dsc.add_command(label='LUT', compound=LEFT, command= lambda: NewLutWindow(self.image, self.name, self))        
+        self.dsc.add_command(label='LUT', compound=LEFT, command= lambda: self.create_lut_window())        
         self.dsc.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command= lambda: self.create_profile_window())
 
         histMan = Menu(topMenu, tearoff=False)
@@ -70,7 +72,7 @@ class NewImageWindow(Toplevel):
 
         pointOper = Menu(topMenu, tearoff=False)
         pointOper.add_command(label="Negacja", compound=LEFT, command= lambda: self.negate_image())
-        pointOper.add_command(label="Progowanie", compound=LEFT, command= lambda: 2+2)
+        pointOper.add_command(label="Progowanie", compound=LEFT, command= lambda: self.threshold_image())
         pointOper.add_command(label="Posteryzacja", compound=LEFT, command= lambda: 2+2)
 
         topMenu.add_cascade(label="Opis", menu=self.dsc)
@@ -91,17 +93,28 @@ class NewImageWindow(Toplevel):
 
     def create_histogram_window(self):
         self.histogramWindow = NewHistogramWindow(self.image, self.name, self)
+
+    def create_lut_window(self):
+        self.lutWindow = NewLutWindow(self.image, self.name, self)
+
+    def update_child_windows(self):
+        if self.histogramWindow is not None:
+            self.histogramWindow.update_histogram(self.image)
+
+        if self.lutWindow is not None:
+            self.lutWindow.display_lut_values(self.image)
     # -------------------
 
     # OPERATIONS
     def negate_image(self):
         self.image.negate()
         self.update_visible_image()
-        if self.histogramWindow is not None:
-            self.histogramWindow.update_histogram(self.image)
+        self.update_child_windows()
 
     def threshold_image(self):
-        pass
+        self.image.threshold(70, True)
+        self.update_visible_image()
+        self.update_child_windows()
 
     def posterize_image(self):
         pass

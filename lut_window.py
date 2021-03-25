@@ -9,6 +9,7 @@ class NewLutWindow(Toplevel):
         self.set_basic(image, name)
     
         self.display_lut_values(image)
+        self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_master())
         
 
     def set_basic(self, image, name):
@@ -62,5 +63,10 @@ class NewLutWindow(Toplevel):
                 Label(self.write_frame, text=count[1], borderwidth=2, relief="raised", width=5, height=2).grid(row=2, column=value+1)
                 Label(self.write_frame, text=count[2], borderwidth=2, relief="raised", width=5, height=2).grid(row=3, column=value+1)
                 Label(self.write_frame, text=sum(count), borderwidth=2, relief="raised", width=5, height=2).grid(row=4, column=value+1)
+
+
+    def report_close_to_master(self):
+        self.master.lutWindow = None
+        self.destroy()
 
         

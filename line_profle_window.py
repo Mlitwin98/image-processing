@@ -16,7 +16,8 @@ class NewLineProfileWindow(Toplevel):
         self.update_line(lineCoords, image)
         self.p.set_xlabel('Pixel')
         self.p.set_ylabel('Wartość')
-        
+        self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_master())
+    
     def set_figures(self):
         self.plotPanel = Label(self)
         self.plotPanel.place(relwidth=1, relheight = 1, x=0, y=0)
@@ -36,3 +37,8 @@ class NewLineProfileWindow(Toplevel):
             self.p.plot(self.data[:, 0], 'r', self.data[:, 1], 'g', self.data[:, 2], 'b')
         self.p.axis([0, len(self.data)-1, 0, 255])
         self.canvas.draw()
+
+    def report_close_to_master(self):
+        self.master.profileWindow = None
+        self.destroy()
+    

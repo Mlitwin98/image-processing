@@ -41,3 +41,21 @@ class ImageSaved():
         maxVal = np.amax(self.cv2Image)
         self.cv2Image = maxVal - self.cv2Image
         self.fill_histogram()
+
+    def threshold(self, level, keep_val):
+        h, w = self.cv2Image.shape
+        if keep_val:
+            for i in range(h):
+                    for j in range(w):
+                        if self.cv2Image[i][j] <= level:
+                            self.cv2Image[i][j] = 0
+
+        else:
+            for i in range(h):
+                    for j in range(w):
+                        if self.cv2Image[i][j] <= level:
+                            self.cv2Image[i][j] = 0
+                        else:
+                            self.cv2Image[i][j] = 255
+
+        self.fill_histogram()

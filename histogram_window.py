@@ -12,6 +12,7 @@ class NewHistogramWindow(Toplevel):
         self.create_hist_value_display()  
         self.set_figures()                
         self.update_histogram(image)
+        self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_master())
         
 
     def mouse_move(self, event):
@@ -68,3 +69,7 @@ class NewHistogramWindow(Toplevel):
         self.histogramPanel.place(relwidth=1, relheight = 1, x=0, y=0)
         self.title("Histogram {}".format(name))
         self.minsize(800, 500)
+
+    def report_close_to_master(self):
+        self.master.histogramWindow = None
+        self.destroy()
