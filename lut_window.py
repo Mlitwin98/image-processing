@@ -2,19 +2,19 @@ from tkinter import Canvas, Frame, Label
 from tkinter import Toplevel
 from tkinter import ttk
 from tkinter.constants import BOTH, BOTTOM, HORIZONTAL, LEFT, X,  NW
+from numpy import ndenumerate
 
 class NewLutWindow(Toplevel):
-    def __init__(self, image, name, master = None): 
+    def __init__(self, name, master = None): 
         super().__init__(master = master)
-        self.set_basic(image, name)
+        self.set_basic(name)
     
-        self.display_lut_values(image)
+        self.display_lut_values()
         self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_master())
         
 
-    def set_basic(self, image, name):
-        self.image = image
-        if image.isGrayScale:
+    def set_basic(self, name):
+        if self.master.image.isGrayScale:
             self.geometry('400x100')
             self.minsize(400, 100)
         else:
@@ -44,25 +44,27 @@ class NewLutWindow(Toplevel):
         lutCanvas.create_window((0, 0), window=self.write_frame, anchor=NW)
         
 
-    def display_lut_values(self, image):
-        if image.isGrayScale:
+    def display_lut_values(self):
+        for wg in self.write_frame.winfo_children():
+            wg.destroy()
+        if self.master.image.isGrayScale:
             Label(self.write_frame, text='Wartość: ', borderwidth=2, relief="raised", width=6, height=2, bg="gray").grid(row = 0, column=0)
             Label(self.write_frame, text='Zliczenia: ', borderwidth=2, relief="raised", width=6, height=2).grid(row = 1, column=0)
-            for value,count in enumerate(image.lut):
-                Label(self.write_frame, text=value, borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value+1)
-                Label(self.write_frame, text=count, borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
+            for value,count in ndenumerate(self.master.image.lut):
+                Label(self.write_frame, text=value[0], borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value[0]+1)
+                Label(self.write_frame, text=count, borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value[0]+1)
         else:
             Label(self.write_frame, text='Wartość: ', borderwidth=2, relief="raised", width=10, height=2, bg="gray").grid(row = 0, column=0)
             Label(self.write_frame, text='Red: ', borderwidth=2, relief="raised", width=10, height=2, bg='red').grid(row = 1, column=0)
             Label(self.write_frame, text='Green: ', borderwidth=2, relief="raised", width=10, height=2, bg='green').grid(row = 2, column=0)
             Label(self.write_frame, text='Blue: ', borderwidth=2, relief="raised", width=10, height=2, bg='blue').grid(row = 3, column=0)
             Label(self.write_frame, text='Suma: ', borderwidth=2, relief="raised", width=10, height=2).grid(row = 4, column=0)
-            for value, count in enumerate(image.lut):
-                Label(self.write_frame, text=value, borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value+1)
-                Label(self.write_frame, text=count[0], borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value+1)
-                Label(self.write_frame, text=count[1], borderwidth=2, relief="raised", width=5, height=2).grid(row=2, column=value+1)
-                Label(self.write_frame, text=count[2], borderwidth=2, relief="raised", width=5, height=2).grid(row=3, column=value+1)
-                Label(self.write_frame, text=sum(count), borderwidth=2, relief="raised", width=5, height=2).grid(row=4, column=value+1)
+            for value, count in ndenumerate(self.master.image.lut):
+                Label(self.write_frame, text=value[0], borderwidth=2, relief="raised", width=5, height=2, bg="gray").grid(row=0, column=value[0]+1)
+                Label(self.write_frame, text=count[0], borderwidth=2, relief="raised", width=5, height=2).grid(row=1, column=value[0]+1)
+                Label(self.write_frame, text=count[1], borderwidth=2, relief="raised", width=5, height=2).grid(row=2, column=value[0]+1)
+                Label(self.write_frame, text=count[2], borderwidth=2, relief="raised", width=5, height=2).grid(row=3, column=value[0]+1)
+                Label(self.write_frame, text=sum(count), borderwidth=2, relief="raised", width=5, height=2).grid(row=4, column=value[0]+1)
 
 
     def report_close_to_master(self):

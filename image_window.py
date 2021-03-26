@@ -5,6 +5,7 @@ from image_saved import ImageSaved
 from histogram_window import NewHistogramWindow
 from lut_window import NewLutWindow
 from line_profle_window import NewLineProfileWindow
+from slider_window import NewSliderWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None): 
@@ -40,6 +41,7 @@ class NewImageWindow(Toplevel):
         self.profileWindow = None
         self.histogramWindow = None
         self.lutWindow = None
+        self.thresholdScaleWindow = None
 
     
     def manage_line_profile(self):
@@ -84,25 +86,26 @@ class NewImageWindow(Toplevel):
     def update_visible_image(self):
         self.set_images()
         self.photoImage = ImageTk.PhotoImage(self.imageFromArray)
+        self.imagePanel.delete("all")
         self.imagePanel.create_image(0, 0, anchor=NW, image=self.photoImage)
     # -------------------
 
     # SET CHILD WINDOWS
     def create_profile_window(self):
-        self.profileWindow = NewLineProfileWindow(self.image, self.name, self.lineCoords, [self.newWidth, self.newHeight], self)
+        self.profileWindow = NewLineProfileWindow(self.name, self.lineCoords, [self.newWidth, self.newHeight], self)
 
     def create_histogram_window(self):
-        self.histogramWindow = NewHistogramWindow(self.image, self.name, self)
+        self.histogramWindow = NewHistogramWindow(self.name, self)
 
     def create_lut_window(self):
-        self.lutWindow = NewLutWindow(self.image, self.name, self)
+        self.lutWindow = NewLutWindow(self.name, self)
 
     def update_child_windows(self):
         if self.histogramWindow is not None:
-            self.histogramWindow.update_histogram(self.image)
+            self.histogramWindow.update_histogram()
 
         if self.lutWindow is not None:
-            self.lutWindow.display_lut_values(self.image)
+            self.lutWindow.display_lut_values()
     # -------------------
 
     # OPERATIONS
@@ -112,7 +115,7 @@ class NewImageWindow(Toplevel):
         self.update_child_windows()
 
     def threshold_image(self):
-        self.image.threshold(70, True)
+        self.thresholdScaleWindow = NewSliderWindow(self.name, self)
         self.update_visible_image()
         self.update_child_windows()
 
@@ -135,7 +138,7 @@ class NewImageWindow(Toplevel):
         self.line = self.imagePanel.create_line(self.lineCoords["x"], self.lineCoords["y"], self.lineCoords['x2'], self.lineCoords['y2'], fill='red', dash=(2, 2))
         
         if self.profileWindow is not None:
-            self.profileWindow.update_line(self.lineCoords, self.image)
+            self.profileWindow.update_line(self.lineCoords)
 
     def resize_img(self, event):
         self.newWidth = event.width

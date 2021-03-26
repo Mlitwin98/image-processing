@@ -2,7 +2,7 @@ NOWE:
 1. Rozciąganie histogramu
 2. Wyrównywanie histogramu
 3. 
-----------          DODAĆ PROMPT DLA UŻYTKOWNIKA, 3 progi dla kolorowych?
+----------          CHECKBOX "KEEP_VAL?", 3 progi dla kolorowych?, dramatyczna optymalizacja gdy otworzone jest okno histogramu/lut'u
 4. Progowanie
 5. Progowanie z zachowaniem poziomów szarości
 ----------

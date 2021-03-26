@@ -10,7 +10,9 @@ class ImageSaved():
         else:
             self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
             self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
+            
 
+        self.copy = np.copy(self.cv2Image)
         self.name = path
         self.size = self.cv2Image.size
         self.fill_histogram()
@@ -40,22 +42,15 @@ class ImageSaved():
     def negate(self):
         maxVal = np.amax(self.cv2Image)
         self.cv2Image = maxVal - self.cv2Image
+        self.copy = np.copy(self.cv2Image)
         self.fill_histogram()
 
     def threshold(self, level, keep_val):
-        h, w = self.cv2Image.shape
+        currCopy = np.copy(self.copy)
         if keep_val:
-            for i in range(h):
-                    for j in range(w):
-                        if self.cv2Image[i][j] <= level:
-                            self.cv2Image[i][j] = 0
+            self.cv2Image = np.where(currCopy <= level, 0, self.copy)
 
         else:
-            for i in range(h):
-                    for j in range(w):
-                        if self.cv2Image[i][j] <= level:
-                            self.cv2Image[i][j] = 0
-                        else:
-                            self.cv2Image[i][j] = 255
+            self.cv2Image = np.where(currCopy <= level, 0, 255)
 
         self.fill_histogram()
