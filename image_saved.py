@@ -54,3 +54,18 @@ class ImageSaved():
             self.cv2Image = np.where(currCopy <= level, 0, 255)
 
         self.fill_histogram()
+
+    def posterize(self, numOfBins):
+        currCopy = np.copy(self.copy)
+        binArray = np.arange(np.round(255/numOfBins), 255, np.round(255/numOfBins))
+
+        self.cv2Image[currCopy <= binArray[0]] = 0
+        pointer = 0
+        for bin in binArray[1:]:
+            self.cv2Image[np.logical_and(currCopy > binArray[pointer], currCopy <= bin)] = binArray[pointer]
+            pointer += 1
+
+        self.cv2Image[currCopy > binArray[-1]] = 255
+
+        self.fill_histogram()
+        

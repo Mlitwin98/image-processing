@@ -2,7 +2,7 @@ NOWE:
 1. Rozciąganie histogramu
 2. Wyrównywanie histogramu
 3. 
-----------          CHECKBOX "KEEP_VAL?", 3 progi dla kolorowych?, dramatyczna optymalizacja gdy otworzone jest okno histogramu/lut'u
+----------          3 progi dla kolorowych?, dramatyczna optymalizacja gdy otworzone jest okno histogramu/lut'u
 4. Progowanie
 5. Progowanie z zachowaniem poziomów szarości
 ----------
@@ -11,7 +11,14 @@ NOWE:
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
+2. TRAGEDIA PRZY WYKONYWANIU KILKU RZECZY NA RAZ
+
 
 NA RAZIE NIE ZADANE ALE WAŻNE:
 1. Zapisywanie
 2. Cofanie
+
+
+DO SPYTANIA:
+1. Co z tą posteryzacją?
+2. Czy mogę korzystać z tych skrótowców numpy (w stylu self.cv2Image = np.where(currCopy <= level, 0, self.copy) przy progowaniu) 

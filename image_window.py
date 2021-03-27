@@ -6,6 +6,7 @@ from histogram_window import NewHistogramWindow
 from lut_window import NewLutWindow
 from line_profle_window import NewLineProfileWindow
 from slider_window import NewSliderWindow
+from posterize_window import NewPosterizeWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None): 
@@ -42,6 +43,7 @@ class NewImageWindow(Toplevel):
         self.histogramWindow = None
         self.lutWindow = None
         self.thresholdScaleWindow = None
+        self.posterizeWindow = None
 
     
     def manage_line_profile(self):
@@ -75,7 +77,7 @@ class NewImageWindow(Toplevel):
         pointOper = Menu(topMenu, tearoff=False)
         pointOper.add_command(label="Negacja", compound=LEFT, command= lambda: self.negate_image())
         pointOper.add_command(label="Progowanie", compound=LEFT, command= lambda: self.threshold_image())
-        pointOper.add_command(label="Posteryzacja", compound=LEFT, command= lambda: 2+2)
+        pointOper.add_command(label="Posteryzacja", compound=LEFT, command= lambda: self.posterize_image())
 
         topMenu.add_cascade(label="Opis", menu=self.dsc)
         topMenu.add_cascade(label="Manipulacja histogramem", menu=histMan)
@@ -120,7 +122,9 @@ class NewImageWindow(Toplevel):
         self.update_child_windows()
 
     def posterize_image(self):
-        pass
+        self.posterizeWindow = NewPosterizeWindow(self.name, self)
+        self.update_visible_image()
+        self.update_child_windows()
     # -------------------
 
 
@@ -141,9 +145,9 @@ class NewImageWindow(Toplevel):
             self.profileWindow.update_line(self.lineCoords)
 
     def resize_img(self, event):
-        self.newWidth = event.width
-        self.newHeight = event.height
-        self.imageFromArray = self.imageCopy.resize((self.newWidth, self.newHeight))
+        #self.newWidth = event.width
+        #self.newHeight = event.height
+        #self.imageFromArray = self.imageCopy.resize((self.newWidth, self.newHeight))
         self.photoImage = ImageTk.PhotoImage(self.imageFromArray)
         self.imagePanel.create_image(0, 0, anchor=NW, image=self.photoImage)
     # -------------------
