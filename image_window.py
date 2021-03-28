@@ -145,6 +145,12 @@ class NewImageWindow(Toplevel):
             self.profileWindow.update_line(self.lineCoords)
 
     def resize_img(self, event):
+        offsetX = self.winfo_rootx()-self.winfo_x()
+        offsetY = self.winfo_rooty()-self.winfo_y()
+        if self.posterizeWindow is not None:
+            self.posterizeWindow.geometry('%dx%d+%d+%d' % (self.winfo_width()/2, 30, self.winfo_x()+offsetX, self.winfo_y()+self.winfo_height()+offsetY+2))
+        if self.thresholdScaleWindow is not None:
+            self.thresholdScaleWindow.geometry('%dx%d+%d+%d' % (50, self.winfo_height(),self.winfo_x()+self.winfo_width()+offsetX+2, self.winfo_y()+offsetY))
         #self.newWidth = event.width
         #self.newHeight = event.height
         #self.imageFromArray = self.imageCopy.resize((self.newWidth, self.newHeight))

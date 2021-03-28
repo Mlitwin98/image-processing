@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import copy
 
 class ImageSaved():
     def __init__(self, path):
@@ -12,7 +13,7 @@ class ImageSaved():
             self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
             
 
-        self.copy = np.copy(self.cv2Image)
+        self.copy = copy.deepcopy(self.cv2Image)
         self.name = path
         self.size = self.cv2Image.size
         self.fill_histogram()
@@ -42,21 +43,21 @@ class ImageSaved():
     def negate(self):
         maxVal = np.amax(self.cv2Image)
         self.cv2Image = maxVal - self.cv2Image
-        self.copy = np.copy(self.cv2Image)
+        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def threshold(self, level, keep_val):
-        currCopy = np.copy(self.copy)
+        currCopy = copy.deepcopy(self.copy)
         if keep_val:
-            self.cv2Image = np.where(currCopy <= level, 0, self.copy)
+            self.cv2Image = np.where(currCopy <= level, 0, self.copy).astype(np.uint8)
 
         else:
-            self.cv2Image = np.where(currCopy <= level, 0, 255)
+            self.cv2Image = np.where(currCopy <= level, 0, 255).astype(np.uint8)
 
         self.fill_histogram()
 
     def posterize(self, numOfBins):
-        currCopy = np.copy(self.copy)
+        currCopy = copy.deepcopy(self.copy)
         binArray = np.arange(np.round(255/numOfBins), 255, np.round(255/numOfBins))
 
         self.cv2Image[currCopy <= binArray[0]] = 0

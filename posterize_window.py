@@ -7,6 +7,7 @@ class NewPosterizeWindow(Toplevel):
             self.set_basic(name)
 
             self.master.image.posterize(2)
+            self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_master())
 
     def set_basic(self, name):
         self.overrideredirect(1)
@@ -15,7 +16,7 @@ class NewPosterizeWindow(Toplevel):
         parentY = self.master.winfo_rooty()
         parentHeight = self.master.winfo_height()
         parentWidth = self.master.winfo_width()
-        self.geometry('%dx%d+%d+%d' % (parentWidth/2, 30, parentX, parentY+parentHeight))
+        self.geometry('%dx%d+%d+%d' % (parentWidth/2, 30, parentX, parentY+parentHeight+2))
 
         
         self.spinBox = Spinbox(self, command=lambda:self.update_image(), from_=2, to=255, width=3, font=("Helvetica", 15), justify=RIGHT)
@@ -31,3 +32,7 @@ class NewPosterizeWindow(Toplevel):
         self.master.image.posterize(int(self.spinBox.get()))
         self.master.update_visible_image()
         self.master.update_child_windows()
+
+    def report_close_to_master(self):
+        self.master.lutWindow = None
+        self.destroy()

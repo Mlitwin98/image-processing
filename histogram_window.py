@@ -20,7 +20,7 @@ class NewHistogramWindow(Toplevel):
             if self.master.image.isGrayScale:
                 self.yData.config(text=self.master.image.lut[round(event.xdata)])
             else:
-                self.yData.config(text="({}, {}, {})".format(int(self.master.image.lut[round(event.xdata)][0]), int(self.image.lut[round(event.xdata)][1]), int(self.image.lut[round(event.xdata)][2])))
+                self.yData.config(text="({}, {}, {})".format(int(self.master.image.lut[round(event.xdata)][0]), int(self.master.image.lut[round(event.xdata)][1]), int(self.master.image.lut[round(event.xdata)][2])))
 
 
     def create_hist_value_display(self):
