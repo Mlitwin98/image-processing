@@ -94,7 +94,7 @@ class NewImageWindow(Toplevel):
 
     # SET CHILD WINDOWS
     def create_profile_window(self):
-        self.profileWindow = NewLineProfileWindow(self.name, self.lineCoords, [self.newWidth, self.newHeight], self)
+        self.profileWindow = NewLineProfileWindow(self.name, self.lineCoords, self)
 
     def create_histogram_window(self):
         self.histogramWindow = NewHistogramWindow(self.name, self)

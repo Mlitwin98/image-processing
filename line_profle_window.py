@@ -1,12 +1,12 @@
 from tkinter import Toplevel, Label
-from numpy import transpose, array
+from numpy import transpose, array, arange
 from skimage import draw
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class NewLineProfileWindow(Toplevel):
-    def __init__(self, name, lineCoords, visibleImageRes, master = None): 
+    def __init__(self, name, lineCoords, master = None): 
         super().__init__(master = master)
         self.title("Linia profilu {}".format(name))
         self.minsize(800, 500)
@@ -29,6 +29,8 @@ class NewLineProfileWindow(Toplevel):
     def update_line(self, lineCoords):
         self.p.clear()
         self.line = transpose(array(draw.line(lineCoords['x'], lineCoords['y'], lineCoords['x2'], lineCoords['y2'])))
+        self.line = self.line[self.line[:, 1] < self.master.image.cv2Image.shape[1]]
+        self.line = self.line[self.line[:, 0] < self.master.image.cv2Image.shape[0]]
         if self.master.image.isGrayScale:
             self.data = self.master.image.cv2Image.copy()[self.line[:, 1], self.line[:, 0]]
             self.p.plot(self.data, color='black')
@@ -36,6 +38,8 @@ class NewLineProfileWindow(Toplevel):
             self.data = self.master.image.cv2Image.copy()[self.line[:, 1], self.line[:, 0], :]
             self.p.plot(self.data[:, 0], 'r', self.data[:, 1], 'g', self.data[:, 2], 'b')
         self.p.axis([0, len(self.data)-1, 0, 255])
+        self.p.set_xticks(arange(0, self.data.shape[0], self.data.shape[0]-1))
+        self.p.set_yticks(arange(0, 256, 15))
         self.canvas.draw()
 
     def report_close_to_master(self):

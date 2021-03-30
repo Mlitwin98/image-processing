@@ -19,7 +19,6 @@ file.add_command(label='Zapisz jako...', compound=LEFT, accelerator='Ctrl+Alt+S'
 next = Menu(top_menu, tearoff=False)
 
 top_menu.add_cascade(label='Plik', menu=file)
-top_menu.add_cascade(label='Kolejne okienka', menu=next)
 
 
 root.bind_all("<Control-o>", func= lambda x:import_image(root))
