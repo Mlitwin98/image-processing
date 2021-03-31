@@ -1,9 +1,16 @@
 import cv2
 import numpy as np
 import copy
+import os
 
 class ImageSaved():
     def __init__(self, path):
+        file_extension = os.path.splitext(path)[1]
+        if file_extension == '.bmp':
+            pass
+            #OGARNIJ BMP
+        #else do 20:
+
         self.cv2Image = cv2.imread(path, 1)
         self.isGrayScale = self.check_if_is_gray()
         if self.isGrayScale:
@@ -65,4 +72,40 @@ class ImageSaved():
             pointer += 1
 
         self.cv2Image[currCopy > binArray[-1]] = 255
-        
+
+    def equalize(self):
+        if self.isGrayScale:
+            cumulativeSum = self.lut.cumsum()    
+            cumulativeSum = np.ma.masked_equal(cumulativeSum,0)
+            minVal = cumulativeSum.min()
+            maxVal = cumulativeSum.max()
+            cumulativeSum = (((cumulativeSum-minVal)*255)/(maxVal - minVal)).astype(np.uint8)
+            self.cv2Image = cumulativeSum[self.cv2Image]
+        else:
+            for canal in range(3):
+                cumulativeSum = self.lut[:,canal].cumsum()
+                cumulativeSum = np.ma.masked_equal(cumulativeSum,0)
+                minVal = cumulativeSum.min()
+                maxVal = cumulativeSum.max()
+                cumulativeSum = (((cumulativeSum-minVal)*255)/(maxVal - minVal)).astype(np.uint8)
+                self.cv2Image[:,canal] = cumulativeSum[self.cv2Image[:,canal]]
+
+        self.copy = copy.deepcopy(self.cv2Image)
+        self.fill_histogram()
+
+    def stretch(self):
+        minImg = np.amin(self.cv2Image)
+        maxImg = np.amax(self.cv2Image)
+
+
+        newMax = 255
+        newMin = 0
+
+        def calculate(oldPixel):
+            return int(((oldPixel-minImg) * newMax)/(maxImg-minImg))
+
+        func = np.vectorize(calculate)
+        self.cv2Image = func(self.cv2Image)
+
+        self.copy = copy.deepcopy(self.cv2Image)
+        self.fill_histogram()

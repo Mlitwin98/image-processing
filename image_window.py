@@ -71,8 +71,8 @@ class NewImageWindow(Toplevel):
         self.dsc.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command= lambda: self.create_profile_window())
 
         histMan = Menu(topMenu, tearoff=False)
-        histMan.add_command(label="Rozciąganie", compound=LEFT, command= lambda: 2+2)
-        histMan.add_command(label="Wyrównanie", compound=LEFT, command= lambda: 2+2)
+        histMan.add_command(label="Rozciąganie", compound=LEFT, command= lambda: self.stretch_image())
+        histMan.add_command(label="Wyrównanie", compound=LEFT, command= lambda: self.equalize_image())
 
         pointOper = Menu(topMenu, tearoff=False)
         pointOper.add_command(label="Negacja", compound=LEFT, command= lambda: self.negate_image())
@@ -119,6 +119,16 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # OPERATIONS
+    def equalize_image(self):
+        self.image.equalize()
+        self.update_visible_image()
+        self.update_child_windows()
+
+    def stretch_image(self):
+        self.image.stretch()
+        self.update_visible_image()
+        self.update_child_windows()
+
     def negate_image(self):
         self.image.negate()
         self.update_visible_image()
