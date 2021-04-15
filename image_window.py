@@ -7,6 +7,7 @@ from lut_window import NewLutWindow
 from line_profle_window import NewLineProfileWindow
 from slider_window import NewSliderWindow
 from posterize_window import NewPosterizeWindow
+from two_args_window import NewTwoArgsWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None): 
@@ -21,7 +22,9 @@ class NewImageWindow(Toplevel):
         self.manage_line_profile()
         self.bind_functions()
 
-        print(self.master.winfo_children())
+        for widget in self.master.winfo_children():
+            if(type(widget) == NewImageWindow):
+                print(widget.name)
 
     # BASICS
     def set_geometry(self):
@@ -46,6 +49,11 @@ class NewImageWindow(Toplevel):
         self.lutWindow = None
         self.thresholdScaleWindow = None
         self.posterizeWindow = None
+        NewTwoArgsWindow.images.append(self)
+        for widget in self.master.winfo_children():
+            if(type(widget) == NewTwoArgsWindow):
+                widget.update_list()
+                break
 
     
     def manage_line_profile(self):
@@ -58,6 +66,15 @@ class NewImageWindow(Toplevel):
         self.bind('<Control-d>', lambda event: self.duplicate_window())
         self.bind("<ButtonPress-3>", self.click)
         self.bind("<B3-Motion>", self.drag)
+        self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_windows())
+
+    def report_close_to_windows(self):
+        NewTwoArgsWindow.images.remove(self)
+        for widget in self.master.winfo_children():
+            if(type(widget) == NewTwoArgsWindow):
+                widget.update_list()
+                break
+        self.destroy()
     # -------------------
 
     # WINDOW
@@ -65,16 +82,14 @@ class NewImageWindow(Toplevel):
         NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)')
     
     def place_menu(self):
-        topMenu = Menu()
+        topMenu = Menu(self)
         self.dsc = Menu(topMenu, tearoff=False)
         histMan = Menu(topMenu, tearoff=False)
         imageMan = Menu(topMenu, tearoff=False)
         pointOper = Menu(imageMan, tearoff=False)
-        twoArgsOper = Menu(imageMan, tearoff=False)
-        logOper = Menu(twoArgsOper, tearoff=False)
         neighbOper = Menu(imageMan, tearoff=False)
-        imageMan.add_cascade(label="Jednopunktowe", menu=pointOper)
-        imageMan.add_cascade(label="Dwuargumentowe", menu=twoArgsOper)
+        imageMan.add_cascade(label="Jednoargumentowe", menu=pointOper)
+        imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=lambda:self.create_two_args_window())
         imageMan.add_cascade(label="Sąsiedztwa", menu=neighbOper)
         
         # Opcje OPISU
@@ -86,26 +101,10 @@ class NewImageWindow(Toplevel):
         histMan.add_command(label="Rozciąganie", compound=LEFT, command= lambda: self.stretch_image())
         histMan.add_command(label="Wyrównanie", compound=LEFT, command= lambda: self.equalize_image())
 
-        # Opcje OPERACJI JEDNOPUNKTOWYCH
+        # Opcje OPERACJI JEDNOARGUMENTOWYCH
         pointOper.add_command(label="Negacja", compound=LEFT, command= lambda: self.negate_image())
         pointOper.add_command(label="Progowanie", compound=LEFT, command= lambda: self.threshold_image())
         pointOper.add_command(label="Posteryzacja", compound=LEFT, command= lambda: self.posterize_image())
-      
-        # Opcje OPERACJI DWUARGUMENTOWYCH
-        twoArgsOper.add_command(label="Dodawanie", compound=LEFT, command=lambda:2+2)
-        twoArgsOper.add_command(label="Odejmowanie", compound=LEFT, command=lambda:2+2)
-        twoArgsOper.add_command(label="Mieszanie", compound=LEFT, command=lambda:2+2)
-        twoArgsOper.add_cascade(label="Logiczne", menu=logOper)
-        
-        # OPCJE OPERACJI LOGICZNYCH
-        logOper.add_command(label="AND", compound=LEFT, command=lambda:self.and_image())
-        logOper.add_command(label="OR", compound=LEFT, command=lambda:2+2)
-        logOper.add_command(label="NOT", compound=LEFT, command=lambda:2+2)
-        logOper.add_command(label="XOR", compound=LEFT, command=lambda:2+2)
-
-        # OPCJE OPERACJI SĄSIEDZTWA
-        neighbOper.add_command(label="OPERACJA SĄSIEDZTWA", compound=LEFT, command=lambda:2+2)
-        neighbOper.add_separator()
 
         # Ustawianie co robić z brzegowymi pikselami (nie wiem czy to dobre wyjście pod względem interfejsu)
         self.radioVar = IntVar()
@@ -129,6 +128,15 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
+    def create_two_args_window(self):
+        for widget in self.master.winfo_children():
+            if(type(widget) == NewTwoArgsWindow):
+                widget.lift()
+                widget.attributes("-topmost", True)
+                widget.focus_force()
+                return
+        NewTwoArgsWindow(self.master)
+
     def create_profile_window(self):
         self.profileWindow = NewLineProfileWindow(self.name, self.lineCoords, self)
 
@@ -177,9 +185,6 @@ class NewImageWindow(Toplevel):
         self.posterizeWindow = NewPosterizeWindow(self.name, self)
         self.update_visible_image()
         self.update_child_windows()
-
-    def and_image(self):
-        pass
     # -------------------
 
 

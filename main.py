@@ -1,9 +1,12 @@
-from tkinter import Tk, Canvas, Menu, mainloop
+from tkinter import Tk, Canvas, Menu, mainloop, ttk
+root = Tk()
 from tkinter.constants import LEFT
 from files_options import import_image
 
-root = Tk()
+
 root.title("IPLM")
+style = ttk.Style(root)
+style.theme_use('alt')
 canvas = Canvas(root, height=0, width=200)
 canvas.pack()
 

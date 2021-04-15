@@ -1,5 +1,7 @@
-from tkinter import Button, PhotoImage, Scale, Toplevel, IntVar, ttk
-from tkinter.constants import CENTER, S, VERTICAL
+from tkinter import Scale, Toplevel, IntVar
+from tkinter.constants import VERTICAL
+from tkinter.ttk import Button, Checkbutton
+from icons_import import saveIcon, closeIcon
 
 class NewSliderWindow(Toplevel):
     def __init__(self, name, master = None): 
@@ -25,10 +27,8 @@ class NewSliderWindow(Toplevel):
         self.geometry('%dx%d+%d+%d' % (self.width, parentHeight, parentX+parentWidth+2, parentY))
 
     def set_save_closeButtons(self):
-        self.saveIcon = PhotoImage(file=r"icons/tick.png")
-        self.closeIcon = PhotoImage(file=r"icons/close.png")
-        self.saveButton = Button(self, image=self.saveIcon, command=lambda: self.update_image())
-        self.cancelButton = Button(self, image=self.closeIcon, command=lambda: self.cancel())
+        self.saveButton = Button(self, image=saveIcon, command=lambda: self.update_image())
+        self.cancelButton = Button(self, image=closeIcon, command=lambda: self.cancel())
 
         self.saveButton.place(relx=0.1, rely=0.8, relwidth=0.4)
         self.cancelButton.place(relx=0.55, rely=0.8, relwidth=0.4)
@@ -37,8 +37,8 @@ class NewSliderWindow(Toplevel):
         self.cancelButton.place(relx=0.55, rely=1-((0.4*self.width)/self.master.winfo_height()), relwidth=0.4)
 
     def place_buttons(self):
-        self.saveButton.place(relx=0.1, rely=1-((0.4*self.width)/self.master.winfo_height()), relwidth=0.4)
-        self.cancelButton.place(relx=0.55, rely=1-((0.4*self.width)/self.master.winfo_height()), relwidth=0.4)
+        self.saveButton.place(relx=0.03, rely=1-((0.45*self.width)/self.master.winfo_height()), relwidth=0.45)
+        self.cancelButton.place(relx=0.52, rely=1-((0.45*self.width)/self.master.winfo_height()), relwidth=0.45)
 
     def set_scale(self):
         self.var = IntVar()
@@ -48,7 +48,7 @@ class NewSliderWindow(Toplevel):
 
     def set_checkButton(self):
         self.cbVal = IntVar()
-        self.cb = ttk.Checkbutton(self, width=0, variable=self.cbVal, command=lambda:self.update_preview(int(self.var.get()), self.cbVal.get()))
+        self.cb = Checkbutton(self, width=0, variable=self.cbVal, command=lambda:self.update_preview(int(self.var.get()), self.cbVal.get()))
         self.cb.place(relx=0.4, rely=0.78)
         self.cb.invoke()
 

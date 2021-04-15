@@ -1,6 +1,7 @@
-from os import access
-from tkinter import Spinbox, Toplevel, PhotoImage, Button
+from tkinter import Spinbox, Toplevel
 from tkinter.constants import LEFT, RIGHT, SE, SW
+from tkinter.ttk import Button
+from icons_import import saveIcon, closeIcon
 
 class NewPosterizeWindow(Toplevel):
     def __init__(self, name, master = None): 
@@ -33,10 +34,8 @@ class NewPosterizeWindow(Toplevel):
         self.spinBox.insert(0,2)
 
     def set_save_closeButtons(self):
-        self.saveIcon = PhotoImage(file=r"icons/tick.png")
-        self.closeIcon = PhotoImage(file=r"icons/close.png")
-        self.saveButton = Button(self, image=self.saveIcon, command=lambda: self.update_image())
-        self.cancelButton = Button(self, image=self.closeIcon, command=lambda: self.cancel())
+        self.saveButton = Button(self, image=saveIcon, command=lambda: self.update_image())
+        self.cancelButton = Button(self, image=closeIcon, command=lambda: self.cancel())
         self.saveButton.place(relx=1-((2*self.height)/self.master.winfo_width()), relheight=1)
         self.cancelButton.place(relx=1-(self.height/self.master.winfo_width()), relheight=1)
 

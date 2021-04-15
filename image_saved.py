@@ -109,3 +109,8 @@ class ImageSaved():
 
         self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
+
+    def bit_not(self):
+        self.cv2Image = cv2.bitwise_not(self.cv2Image)
+        self.copy = copy.deepcopy(self.cv2Image)
+        self.fill_histogram()
