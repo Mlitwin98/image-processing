@@ -1,16 +1,19 @@
 NOWE:
-1. Rozciąganie histogramu
-2. Wyrównywanie histogramu
-3. 
-4. 
-5.
-6.
-7. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax. 
+1. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax
+2. Dodawanie/odejmowanie
+3. Mieszanie (blending)
+4. Operacje logiczne - bitwise AND, OR, NOT, XOR
+5. Operacje sąsiedztwa (zadbać o brzegowe na 3 sposoby):
+    a) blur, gaussianBlur
+    b) Detekcja krawędzi - Sobel, Laplacian, Canny
+    c) Wyostrzanie [[0,-1,0],[-1,5,-1],[0,-1,0]] [[-1,-1,-1],[-1,9,-1],[-1,-1,-1]] [[1,-2, 1],[-2,5,-2],[1,-2, 1]] 
+    d) Kierunkowa detekcja krawędzi - Prewitt (kierunki: N, NE, E, SE, S, SW, W, NW)
+    e) Interaktywne 3x3
+6. Filtracja medianowa do wyboru 3x3, 5x5, 7x7 (zadbać o brzegowe na 3 sposoby)
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
 2. TRAGEDIA PRZY WYKONYWANIU KILKU RZECZY NA RAZ (POSTERYZACJA+PROGOWANIE NIE DZIAŁA)
-
 
 NA RAZIE NIE ZADANE ALE WAŻNE:
 1. Zapisywanie
@@ -19,4 +22,3 @@ NA RAZIE NIE ZADANE ALE WAŻNE:
 
 DO SPYTANIA:
 1. Co z tą posteryzacją?
-2. Czy mogę korzystać z tych skrótowców numpy (w stylu self.cv2Image = np.where(currCopy <= level, 0, self.copy) przy progowaniu) 

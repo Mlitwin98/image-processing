@@ -1,4 +1,4 @@
-from tkinter import Canvas, Toplevel, Menu
+from tkinter import Canvas, Toplevel, Menu, IntVar
 from tkinter.constants import DISABLED, LEFT, NW, NORMAL
 from PIL import Image, ImageTk
 from image_saved import ImageSaved
@@ -20,6 +20,8 @@ class NewImageWindow(Toplevel):
         self.place_menu()
         self.manage_line_profile()
         self.bind_functions()
+
+        print(self.master.winfo_children())
 
     # BASICS
     def set_geometry(self):
@@ -64,24 +66,58 @@ class NewImageWindow(Toplevel):
     
     def place_menu(self):
         topMenu = Menu()
-
         self.dsc = Menu(topMenu, tearoff=False)
+        histMan = Menu(topMenu, tearoff=False)
+        imageMan = Menu(topMenu, tearoff=False)
+        pointOper = Menu(imageMan, tearoff=False)
+        twoArgsOper = Menu(imageMan, tearoff=False)
+        logOper = Menu(twoArgsOper, tearoff=False)
+        neighbOper = Menu(imageMan, tearoff=False)
+        imageMan.add_cascade(label="Jednopunktowe", menu=pointOper)
+        imageMan.add_cascade(label="Dwuargumentowe", menu=twoArgsOper)
+        imageMan.add_cascade(label="Sąsiedztwa", menu=neighbOper)
+        
+        # Opcje OPISU
         self.dsc.add_command(label='Histogram', compound=LEFT, command= lambda: self.create_histogram_window())
         self.dsc.add_command(label='LUT', compound=LEFT, command= lambda: self.create_lut_window())        
         self.dsc.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command= lambda: self.create_profile_window())
 
-        histMan = Menu(topMenu, tearoff=False)
+        # Opcje MANIPULACJI HISTOGRAMEM
         histMan.add_command(label="Rozciąganie", compound=LEFT, command= lambda: self.stretch_image())
         histMan.add_command(label="Wyrównanie", compound=LEFT, command= lambda: self.equalize_image())
 
-        pointOper = Menu(topMenu, tearoff=False)
+        # Opcje OPERACJI JEDNOPUNKTOWYCH
         pointOper.add_command(label="Negacja", compound=LEFT, command= lambda: self.negate_image())
         pointOper.add_command(label="Progowanie", compound=LEFT, command= lambda: self.threshold_image())
         pointOper.add_command(label="Posteryzacja", compound=LEFT, command= lambda: self.posterize_image())
+      
+        # Opcje OPERACJI DWUARGUMENTOWYCH
+        twoArgsOper.add_command(label="Dodawanie", compound=LEFT, command=lambda:2+2)
+        twoArgsOper.add_command(label="Odejmowanie", compound=LEFT, command=lambda:2+2)
+        twoArgsOper.add_command(label="Mieszanie", compound=LEFT, command=lambda:2+2)
+        twoArgsOper.add_cascade(label="Logiczne", menu=logOper)
+        
+        # OPCJE OPERACJI LOGICZNYCH
+        logOper.add_command(label="AND", compound=LEFT, command=lambda:self.and_image())
+        logOper.add_command(label="OR", compound=LEFT, command=lambda:2+2)
+        logOper.add_command(label="NOT", compound=LEFT, command=lambda:2+2)
+        logOper.add_command(label="XOR", compound=LEFT, command=lambda:2+2)
 
+        # OPCJE OPERACJI SĄSIEDZTWA
+        neighbOper.add_command(label="OPERACJA SĄSIEDZTWA", compound=LEFT, command=lambda:2+2)
+        neighbOper.add_separator()
+
+        # Ustawianie co robić z brzegowymi pikselami (nie wiem czy to dobre wyjście pod względem interfejsu)
+        self.radioVar = IntVar()
+        self.radioVar.set(0)
+        neighbOper.add_radiobutton(label="Wartości brzegowe bez zmian", compound=LEFT, value=0, var=self.radioVar)
+        neighbOper.add_radiobutton(label="Padding lustrzany", compound=LEFT, value=1, var=self.radioVar)
+        neighbOper.add_radiobutton(label="Padding powielenia", compound=LEFT, value=2, var=self.radioVar)
+
+        # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Opis", menu=self.dsc)
         topMenu.add_cascade(label="Manipulacja histogramem", menu=histMan)
-        topMenu.add_cascade(label="Operacje jednopunktowe", menu=pointOper)
+        topMenu.add_cascade(label="Operacje", menu=imageMan)
 
         self.config(menu = topMenu)
     
@@ -141,6 +177,9 @@ class NewImageWindow(Toplevel):
         self.posterizeWindow = NewPosterizeWindow(self.name, self)
         self.update_visible_image()
         self.update_child_windows()
+
+    def and_image(self):
+        pass
     # -------------------
 
 
