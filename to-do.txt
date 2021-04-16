@@ -14,7 +14,9 @@ NOWE:
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
 2. TRAGEDIA PRZY WYKONYWANIU KILKU RZECZY NA RAZ (POSTERYZACJA+PROGOWANIE NIE DZIAŁA)
-3. Operacje logiczne w swoim okienku jako wybór Radio
+3. Zmienić sposób przypisywanie imageWindow, bo rozwala się gdy chce się wykonać więcej operacji
+4. Checkbox pytający czy chcemy nowe okienko z wynikiem
+5. MOŻLIWOSĆ DODANIA TEGO OKIENKA, nie mam możliwości stworzenia ImageWindow z samej tablicy obrazu
 
 NA RAZIE NIE ZADANE ALE WAŻNE:
 1. Zapisywanie
@@ -24,6 +26,8 @@ DO ZROBIENIA Z OLĄ:
 1. Jeżeli okienko opisu już istnieje to dać na nie focus po próbie otwarcia kolejnego
 2. To samo dla okienek operacji
 3. Zapisywanie? (asksavefile)
+4. Obiekt nie usuwa się ze słownika po zmianie XDDD
 
 DO SPYTANIA:
 1. Co z tą posteryzacją?
+2. Czy blend pyta o alfa, beta, gamma

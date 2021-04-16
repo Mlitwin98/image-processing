@@ -19,7 +19,6 @@ class ImageSaved():
             self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
             self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
             
-
         self.copy = copy.deepcopy(self.cv2Image)
         self.name = path
         self.size = self.cv2Image.size
@@ -110,7 +109,48 @@ class ImageSaved():
         self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
-    def bit_not(self):
-        self.cv2Image = cv2.bitwise_not(self.cv2Image)
-        self.copy = copy.deepcopy(self.cv2Image)
+    def add(self, imgToAdd):
+        img = imgToAdd.cv2Image
+        img = cv2.resize(img, self.cv2Image.shape)
+        self.cv2Image = cv2.add(self.cv2Image, img)
+        self.fill_histogram()
+
+    def sub(self, imgToAdd):
+        img = imgToAdd.cv2Image
+        h, w = self.cv2Image.shape
+        dstSize = (w, h)
+        img = cv2.resize(img, dstSize)
+        self.cv2Image = cv2.subtract(self.cv2Image, img)
+        self.fill_histogram()
+
+    def blend(self, imgToAdd):
+        img = imgToAdd.cv2Image
+        h, w = self.cv2Image.shape
+        dstSize = (w, h)
+        img = cv2.resize(img, dstSize)
+        self.cv2Image = cv2.addWeighted(self.cv2Image, 0.7, img, 0.5, -100)
+        self.fill_histogram()
+
+    def bit_and(self, imgToAdd):
+        img = imgToAdd.cv2Image
+        h, w = self.cv2Image.shape
+        dstSize = (w, h)
+        img = cv2.resize(img, dstSize)
+        self.cv2Image = cv2.bitwise_and(self.cv2Image, img)
+        self.fill_histogram()
+
+    def bit_or(self, imgToAdd):
+        img = imgToAdd.cv2Image
+        h, w = self.cv2Image.shape
+        dstSize = (w, h)
+        img = cv2.resize(img, dstSize)
+        self.cv2Image = cv2.bitwise_or(self.cv2Image, img)
+        self.fill_histogram()
+
+    def bit_xor(self, imgToAdd):
+        img = imgToAdd.cv2Image
+        h, w = self.cv2Image.shape
+        dstSize = (w, h)
+        img = cv2.resize(img, dstSize)
+        self.cv2Image = cv2.bitwise_xor(self.cv2Image, img)
         self.fill_histogram()

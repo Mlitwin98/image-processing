@@ -22,10 +22,6 @@ class NewImageWindow(Toplevel):
         self.manage_line_profile()
         self.bind_functions()
 
-        for widget in self.master.winfo_children():
-            if(type(widget) == NewImageWindow):
-                print(widget.name)
-
     # BASICS
     def set_geometry(self):
         self.geometry('{}x{}'.format(self.imageFromArray.width, self.imageFromArray.height))
@@ -49,7 +45,7 @@ class NewImageWindow(Toplevel):
         self.lutWindow = None
         self.thresholdScaleWindow = None
         self.posterizeWindow = None
-        NewTwoArgsWindow.images.append(self)
+        NewTwoArgsWindow.images[self] = self.name
         for widget in self.master.winfo_children():
             if(type(widget) == NewTwoArgsWindow):
                 widget.update_list()
@@ -69,7 +65,7 @@ class NewImageWindow(Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_windows())
 
     def report_close_to_windows(self):
-        NewTwoArgsWindow.images.remove(self)
+        NewTwoArgsWindow.images.pop(self)
         for widget in self.master.winfo_children():
             if(type(widget) == NewTwoArgsWindow):
                 widget.update_list()
