@@ -1,3 +1,4 @@
+import copy
 from tkinter import Spinbox, Toplevel
 from tkinter.constants import LEFT, RIGHT, SE, SW
 from tkinter.ttk import Button
@@ -48,11 +49,16 @@ class NewPosterizeWindow(Toplevel):
         self.master.update_visible_image()
 
     def update_image(self):
+        self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
+        self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()
+        self.master.posterizeWindow = None
+        self.destroy()
+
 
     def cancel(self):
-        self.master.image.cv2Image = self.master.image.copy
+        self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
         self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()

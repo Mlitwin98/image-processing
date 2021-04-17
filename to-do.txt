@@ -1,8 +1,5 @@
 NOWE:
 1. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax
-2. Dodawanie/odejmowanie
-3. Mieszanie (blending)
-4. Operacje logiczne - bitwise AND, OR, XOR
 5. Operacje sąsiedztwa (zadbać o brzegowe na 3 sposoby):
     a) blur, gaussianBlur
     b) Detekcja krawędzi - Sobel, Laplacian, Canny
@@ -14,7 +11,6 @@ NOWE:
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
 2. TRAGEDIA PRZY WYKONYWANIU KILKU RZECZY NA RAZ (POSTERYZACJA+PROGOWANIE NIE DZIAŁA)
-3. Zmienić sposób przypisywanie imageWindow, bo rozwala się gdy chce się wykonać więcej operacji
 4. Checkbox pytający czy chcemy nowe okienko z wynikiem
 5. MOŻLIWOSĆ DODANIA TEGO OKIENKA, nie mam możliwości stworzenia ImageWindow z samej tablicy obrazu
 
@@ -23,10 +19,7 @@ NA RAZIE NIE ZADANE ALE WAŻNE:
 2. Cofanie
 
 DO ZROBIENIA Z OLĄ:
-1. Jeżeli okienko opisu już istnieje to dać na nie focus po próbie otwarcia kolejnego
-2. To samo dla okienek operacji
 3. Zapisywanie? (asksavefile)
-4. Obiekt nie usuwa się ze słownika po zmianie XDDD
 
 DO SPYTANIA:
 1. Co z tą posteryzacją?

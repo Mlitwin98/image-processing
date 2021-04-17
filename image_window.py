@@ -128,18 +128,33 @@ class NewImageWindow(Toplevel):
         for widget in self.master.winfo_children():
             if(type(widget) == NewTwoArgsWindow):
                 widget.lift()
-                widget.attributes("-topmost", True)
-                widget.focus_force()
+                widget.focus_set()
                 return
-        NewTwoArgsWindow(self.master)
+        wg = NewTwoArgsWindow(self.master)
+        wg.focus_set()
 
     def create_profile_window(self):
+        for widget in self.winfo_children():
+            if(type(widget) == NewLineProfileWindow):
+                widget.lift()
+                widget.focus_set()
+                return
         self.profileWindow = NewLineProfileWindow(self.name, self.lineCoords, self)
-
+        
     def create_histogram_window(self):
+        for widget in self.winfo_children():
+            if(type(widget) == NewHistogramWindow):
+                widget.lift()
+                widget.focus_set()
+                return
         self.histogramWindow = NewHistogramWindow(self.name, self)
 
     def create_lut_window(self):
+        for widget in self.winfo_children():
+            if(type(widget) == NewLutWindow):
+                widget.lift()
+                widget.focus_set()
+                return
         self.lutWindow = NewLutWindow(self.name, self)
 
     def update_child_windows(self):
@@ -175,12 +190,14 @@ class NewImageWindow(Toplevel):
         self.update_child_windows()
 
     def threshold_image(self):
-        self.thresholdScaleWindow = NewSliderWindow(self.name, self)
+        if self.thresholdScaleWindow is None:
+            self.thresholdScaleWindow = NewSliderWindow(self.name, self)
 
     def posterize_image(self):
-        self.posterizeWindow = NewPosterizeWindow(self.name, self)
-        self.update_visible_image()
-        self.update_child_windows()
+        if self.posterizeWindow is None:
+            self.posterizeWindow = NewPosterizeWindow(self.name, self)
+            self.update_visible_image()
+            self.update_child_windows()
     # -------------------
 
 

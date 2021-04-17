@@ -1,3 +1,4 @@
+import copy
 from tkinter import Scale, Toplevel, IntVar
 from tkinter.constants import VERTICAL
 from tkinter.ttk import Button, Checkbutton
@@ -59,12 +60,16 @@ class NewSliderWindow(Toplevel):
         
     #UPDATE IMAGE ON "SAVE" AND UPDATE HISTOGRAM
     def update_image(self):
+        self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
+        self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()
+        self.master.thresholdScaleWindow = None
+        self.destroy()
 
     #GO BACK TO ORIGINAL ON "CANCEL"
     def cancel(self):
-        self.master.image.cv2Image = self.master.image.copy
+        self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
         self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()

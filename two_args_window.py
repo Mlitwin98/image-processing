@@ -10,6 +10,7 @@ class NewTwoArgsWindow(Toplevel):
         super().__init__(master = master)   
 
         self.set_basic()
+        self.set_operations()
         self.set_widgets()         
 
         
@@ -18,8 +19,18 @@ class NewTwoArgsWindow(Toplevel):
         self.maxsize(200, 200)
         self.title("Operacje logiczne")
 
+    def set_operations(self):
+        self.imageWindow1, self.imageWindow2 = None, None
+        self.operations = {
+            "DODAJ": lambda i:self.imageWindow1.image.add(i),
+            "ODEJMIJ": lambda i:self.imageWindow1.image.sub(i),
+            "ZMIESZAJ": lambda i:self.imageWindow1.image.blend(i),
+            "AND": lambda i:self.imageWindow1.image.bit_and(i),
+            "OR": lambda i:self.imageWindow1.image.bit_or(i),
+            "XOR": lambda i:self.imageWindow1.image.bit_xor(i),
+        }
+
     def set_widgets(self):
-        operations = ["DODAJ", "ODEJMIJ", "ZMIESZAJ", "AND", "OR", "XOR"]
         self.firstChoice = StringVar(self)
         self.secondChoice = StringVar(self)
         self.operationChoice = StringVar(self)
@@ -31,8 +42,8 @@ class NewTwoArgsWindow(Toplevel):
         
         self.update_list()
 
-        self.operationChoice.set(operations[0])
-        for oper in operations:
+        self.operationChoice.set(list(self.operations.keys())[0])
+        for oper in list(self.operations.keys()):
             self.operationList['menu'].add_command(label=oper, command=lambda v=oper: self.operationChoice.set(v))
 
         self.saveButton = Button(self, image=saveIcon, command=lambda: self.update_image())
@@ -41,31 +52,23 @@ class NewTwoArgsWindow(Toplevel):
         self.place_widgets()
 
     def update_image(self):
-        imageWindow1, imageWindow2 = None, None
+        
         for obj, name in NewTwoArgsWindow.images.items():
             if name == self.firstChoice.get():
-                imageWindow1 = obj
-                if self.firstChoice.get() != self.secondChoice.get():
-                    NewTwoArgsWindow.images.pop(obj)
+                self.imageWindow1 = obj
                 break
 
         for obj, name in NewTwoArgsWindow.images.items():
             if name == self.secondChoice.get():
-                imageWindow2 = obj
+                self.imageWindow2 = obj
+                break
 
-        self.operations = {
-            "DODAJ": imageWindow1.image.add,
-            "ODEJMIJ": imageWindow1.image.sub,
-            "ZMIESZAJ": imageWindow1.image.blend,
-            "AND": imageWindow1.image.bit_and,
-            "OR": imageWindow1.image.bit_or,
-            "XOR": imageWindow1.image.bit_xor,
-        }
-        self.operations[self.operationChoice.get()](imageWindow2.image)
+        
+        self.operations[self.operationChoice.get()](self.imageWindow2.image)
 
         #JEŻELI NOWIE OKIENKO TO RÓB NOWE OKIENKO
-        imageWindow1.update_visible_image()
-        imageWindow1.update_child_windows()
+        self.imageWindow1.update_visible_image()
+        self.imageWindow1.update_child_windows()
         self.cancel()
 
     def cancel(self):
