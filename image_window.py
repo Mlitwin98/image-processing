@@ -1,4 +1,4 @@
-from tkinter import Canvas, Toplevel, Menu, IntVar
+from tkinter import Canvas, Toplevel, Menu
 from tkinter.constants import DISABLED, LEFT, NW, NORMAL
 from PIL import Image, ImageTk
 from image_saved import ImageSaved
@@ -10,31 +10,36 @@ from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
 
 class NewImageWindow(Toplevel):
-    def __init__(self, master = None, pathToImage = None, name=None): 
+    def __init__(self, master = None, pathToImage = None, name=None, image=None): 
         super().__init__(master = master)
 
-        self.pathToImage = pathToImage
-        self.image = ImageSaved(pathToImage)
+        if pathToImage is not None and image is None:
+            self.pathToImage = pathToImage
+            self.image = ImageSaved(pathToImage)
+        elif image is not None and pathToImage is None:
+            self.image = image
         self.set_images()
         self.set_geometry()
-        self.set_basic(master, pathToImage, name)
+        self.set_basic(master, name)
         self.place_menu()
         self.manage_line_profile()
         self.bind_functions()
 
     # BASICS
+    def create_another(self, master, pathToImage, name, image):
+        NewImageWindow(master, pathToImage, name, image)
+
     def set_geometry(self):
         self.geometry('{}x{}'.format(self.imageFromArray.width, self.imageFromArray.height))
-        self.minsize(200, 200)
+        self.minsize(self.imageFromArray.width, self.imageFromArray.height)
     
     def set_images(self):        
         self.imageFromArray = Image.fromarray(self.image.cv2Image)
         self.imageCopy = self.imageFromArray.copy()
 
-    def set_basic(self, master, pathToImage, name):
+    def set_basic(self, master, name):
         self.focus_force()
         self.master = master
-        self.path = pathToImage
         self.name = name 
         self.title(name) 
         self.imagePanel = Canvas(self)
@@ -62,7 +67,7 @@ class NewImageWindow(Toplevel):
         self.bind('<Control-d>', lambda event: self.duplicate_window())
         self.bind("<ButtonPress-3>", self.click)
         self.bind("<B3-Motion>", self.drag)
-        self.protocol("WM_DELETE_WINDOW", lambda: self.report_close_to_windows())
+        self.protocol("WM_DELETE_WINDOW", lambda:self.report_close_to_windows())
 
     def report_close_to_windows(self):
         NewTwoArgsWindow.images.pop(self)
@@ -75,7 +80,7 @@ class NewImageWindow(Toplevel):
 
     # WINDOW
     def duplicate_window(self):
-        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)')
+        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)', self.image)
     
     def place_menu(self):
         topMenu = Menu(self)
@@ -83,31 +88,23 @@ class NewImageWindow(Toplevel):
         histMan = Menu(topMenu, tearoff=False)
         imageMan = Menu(topMenu, tearoff=False)
         pointOper = Menu(imageMan, tearoff=False)
-        neighbOper = Menu(imageMan, tearoff=False)
         imageMan.add_cascade(label="Jednoargumentowe", menu=pointOper)
-        imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=lambda:self.create_two_args_window())
-        imageMan.add_cascade(label="Sąsiedztwa", menu=neighbOper)
+        imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=self.create_two_args_window)
+        imageMan.add_command(label="Sąsiedztwa", compound=LEFT, command=2+2)
         
         # Opcje OPISU
-        self.dsc.add_command(label='Histogram', compound=LEFT, command= lambda: self.create_histogram_window())
-        self.dsc.add_command(label='LUT', compound=LEFT, command= lambda: self.create_lut_window())        
-        self.dsc.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command= lambda: self.create_profile_window())
+        self.dsc.add_command(label='Histogram', compound=LEFT, command=self.create_histogram_window)
+        self.dsc.add_command(label='LUT', compound=LEFT, command=self.create_lut_window)        
+        self.dsc.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command=self.create_profile_window)
 
         # Opcje MANIPULACJI HISTOGRAMEM
-        histMan.add_command(label="Rozciąganie", compound=LEFT, command= lambda: self.stretch_image())
-        histMan.add_command(label="Wyrównanie", compound=LEFT, command= lambda: self.equalize_image())
+        histMan.add_command(label="Rozciąganie", compound=LEFT, command=self.stretch_image)
+        histMan.add_command(label="Wyrównanie", compound=LEFT, command=self.equalize_image)
 
         # Opcje OPERACJI JEDNOARGUMENTOWYCH
-        pointOper.add_command(label="Negacja", compound=LEFT, command= lambda: self.negate_image())
-        pointOper.add_command(label="Progowanie", compound=LEFT, command= lambda: self.threshold_image())
-        pointOper.add_command(label="Posteryzacja", compound=LEFT, command= lambda: self.posterize_image())
-
-        # Ustawianie co robić z brzegowymi pikselami (nie wiem czy to dobre wyjście pod względem interfejsu)
-        self.radioVar = IntVar()
-        self.radioVar.set(0)
-        neighbOper.add_radiobutton(label="Wartości brzegowe bez zmian", compound=LEFT, value=0, var=self.radioVar)
-        neighbOper.add_radiobutton(label="Padding lustrzany", compound=LEFT, value=1, var=self.radioVar)
-        neighbOper.add_radiobutton(label="Padding powielenia", compound=LEFT, value=2, var=self.radioVar)
+        pointOper.add_command(label="Negacja", compound=LEFT, command=self.negate_image)
+        pointOper.add_command(label="Progowanie", compound=LEFT, command=self.threshold_image)
+        pointOper.add_command(label="Posteryzacja", compound=LEFT, command=self.posterize_image)
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Opis", menu=self.dsc)
@@ -173,7 +170,7 @@ class NewImageWindow(Toplevel):
             self.thresholdScaleWindow.geometry('%dx%d+%d+%d' % (self.thresholdScaleWindow.width, self.winfo_height(),self.winfo_x()+self.winfo_width()+offsetX+2, self.winfo_y()+offsetY))
     # -------------------
 
-    # OPERATIONS
+    # ONE CLICK OPERATIONS
     def equalize_image(self):
         self.image.equalize()
         self.update_visible_image()

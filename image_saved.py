@@ -4,24 +4,26 @@ import copy
 import os
 
 class ImageSaved():
-    def __init__(self, path):
-        file_extension = os.path.splitext(path)[1]
-        if file_extension == '.bmp':
-            pass
-            #OGARNIJ BMP
-        #else do 20:
+    def __init__(self, path=None, imageArray=None):
+        if path is not None:
+            file_extension = os.path.splitext(path)[1]
+            if file_extension == '.bmp':
+                pass
+                #OGARNIJ BMP
+            #else do 20:
 
-        self.cv2Image = cv2.imread(path, 1)
-        self.isGrayScale = self.check_if_is_gray()
-        if self.isGrayScale:
-            self.cv2Image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            self.cv2Image = cv2.imread(path, 1)
+            self.isGrayScale = self.check_if_is_gray()
+            if self.isGrayScale:
+                self.cv2Image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            else:
+                self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
+                self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
         else:
-            self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
-            self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
+            self.cv2Image = imageArray
+            self.isGrayScale = self.check_if_is_gray()
             
         self.copy = copy.deepcopy(self.cv2Image)
-        self.name = path
-        self.size = self.cv2Image.size
         self.fill_histogram()
 
     def check_if_is_gray(self):
@@ -112,45 +114,39 @@ class ImageSaved():
     def add(self, imgToAdd):
         img = imgToAdd.cv2Image
         img = cv2.resize(img, self.cv2Image.shape)
-        self.cv2Image = cv2.add(self.cv2Image, img)
-        self.fill_histogram()
+        return cv2.add(self.cv2Image, img)
 
     def sub(self, imgToAdd):
         img = imgToAdd.cv2Image
         h, w = self.cv2Image.shape
         dstSize = (w, h)
         img = cv2.resize(img, dstSize)
-        self.cv2Image = cv2.subtract(self.cv2Image, img)
-        self.fill_histogram()
+        return cv2.subtract(self.cv2Image, img)
 
     def blend(self, imgToAdd):
         img = imgToAdd.cv2Image
         h, w = self.cv2Image.shape
         dstSize = (w, h)
         img = cv2.resize(img, dstSize)
-        self.cv2Image = cv2.addWeighted(self.cv2Image, 0.7, img, 0.5, -100)
-        self.fill_histogram()
+        return cv2.addWeighted(self.cv2Image, 0.7, img, 0.5, -100)
 
     def bit_and(self, imgToAdd):
         img = imgToAdd.cv2Image
         h, w = self.cv2Image.shape
         dstSize = (w, h)
         img = cv2.resize(img, dstSize)
-        self.cv2Image = cv2.bitwise_and(self.cv2Image, img)
-        self.fill_histogram()
+        return cv2.bitwise_and(self.cv2Image, img)
 
     def bit_or(self, imgToAdd):
         img = imgToAdd.cv2Image
         h, w = self.cv2Image.shape
         dstSize = (w, h)
         img = cv2.resize(img, dstSize)
-        self.cv2Image = cv2.bitwise_or(self.cv2Image, img)
-        self.fill_histogram()
+        return cv2.bitwise_or(self.cv2Image, img)
 
     def bit_xor(self, imgToAdd):
         img = imgToAdd.cv2Image
         h, w = self.cv2Image.shape
         dstSize = (w, h)
         img = cv2.resize(img, dstSize)
-        self.cv2Image = cv2.bitwise_xor(self.cv2Image, img)
-        self.fill_histogram()
+        return cv2.bitwise_xor(self.cv2Image, img)

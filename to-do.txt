@@ -1,26 +1,28 @@
 NOWE:
 1. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax
-5. Operacje sąsiedztwa (zadbać o brzegowe na 3 sposoby):
+2. Operacje sąsiedztwa (zadbać o brzegowe na 3 sposoby):
     a) blur, gaussianBlur
     b) Detekcja krawędzi - Sobel, Laplacian, Canny
     c) Wyostrzanie [[0,-1,0],[-1,5,-1],[0,-1,0]] [[-1,-1,-1],[-1,9,-1],[-1,-1,-1]] [[1,-2, 1],[-2,5,-2],[1,-2, 1]] 
     d) Kierunkowa detekcja krawędzi - Prewitt (kierunki: N, NE, E, SE, S, SW, W, NW)
     e) Interaktywne 3x3
-6. Filtracja medianowa do wyboru 3x3, 5x5, 7x7 (zadbać o brzegowe na 3 sposoby)
+3. Filtracja medianowa do wyboru 3x3, 5x5, 7x7 (zadbać o brzegowe na 3 sposoby)
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
-2. TRAGEDIA PRZY WYKONYWANIU KILKU RZECZY NA RAZ (POSTERYZACJA+PROGOWANIE NIE DZIAŁA)
-4. Checkbox pytający czy chcemy nowe okienko z wynikiem
-5. MOŻLIWOSĆ DODANIA TEGO OKIENKA, nie mam możliwości stworzenia ImageWindow z samej tablicy obrazu
+2. Złe rozmiary okienka, nie mieści małych obrazków
 
 NA RAZIE NIE ZADANE ALE WAŻNE:
 1. Zapisywanie
 2. Cofanie
 
 DO ZROBIENIA Z OLĄ:
-3. Zapisywanie? (asksavefile)
+1. 
 
 DO SPYTANIA:
-1. Co z tą posteryzacją?
-2. Czy blend pyta o alfa, beta, gamma
+1. Czy blend pyta o alfa, beta, gamma
+
+NEXT:
+OKIENKO OTWIERA SIĘ PO KLIKNIĘCIU OPERACJA->SĄSIEDZTWA
+LISTA Z OPERACAMI DO ZAIMPLEMENTOWANIA
+POD SPODEM MASKA WYPEŁNIONA WARTIOŚCIAMI W ZALEŻNOŚCI OD WYBORU + PUSTE DLA INTERAKTYWNEJ

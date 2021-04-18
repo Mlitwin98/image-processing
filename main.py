@@ -4,7 +4,7 @@ from tkinter.constants import LEFT
 from files_options import import_image
 
 
-root.title("IPLM")
+root.title("APO")
 style = ttk.Style(root)
 style.theme_use('alt')
 canvas = Canvas(root, height=0, width=200)

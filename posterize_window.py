@@ -1,6 +1,6 @@
 import copy
 from tkinter import Spinbox, Toplevel
-from tkinter.constants import LEFT, RIGHT, SE, SW
+from tkinter.constants import LEFT
 from tkinter.ttk import Button
 from icons_import import saveIcon, closeIcon
 
@@ -35,8 +35,8 @@ class NewPosterizeWindow(Toplevel):
         self.spinBox.insert(0,2)
 
     def set_save_closeButtons(self):
-        self.saveButton = Button(self, image=saveIcon, command=lambda: self.update_image())
-        self.cancelButton = Button(self, image=closeIcon, command=lambda: self.cancel())
+        self.saveButton = Button(self, image=saveIcon, command=self.update_image)
+        self.cancelButton = Button(self, image=closeIcon, command=self.cancel)
         self.saveButton.place(relx=1-((2*self.height)/self.master.winfo_width()), relheight=1)
         self.cancelButton.place(relx=1-(self.height/self.master.winfo_width()), relheight=1)
 
