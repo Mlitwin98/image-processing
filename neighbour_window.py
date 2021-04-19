@@ -1,5 +1,5 @@
 import copy
-from tkinter import Label, StringVar, Toplevel
+from tkinter import Entry, Label, StringVar, Toplevel
 from tkinter.ttk import Button, OptionMenu
 from icons_import import saveIcon, closeIcon
 
@@ -13,66 +13,65 @@ class NewNeighbourWindow(Toplevel):
 
         
     def set_basic(self, option):
-        self.minsize(400, 400)
-        self.maxsize(400, 400)
+        self.minsize(400, 500)
+        self.maxsize(400, 500)
         self.title("Operacje sąsiedztwa")
         self.option = option
 
     def set_operations(self):
         operationsSmooth = {
-            "Blurr": 2+2,
-            "Gaussian Blurr": 2+2,
+            "Blurr3x3": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,"1/9","1/9","1/9",0,0], [0,0,"1/9","1/9","1/9",0,0], [0,0,"1/9","1/9","1/9",0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Gaussian Blurr": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
         }
-
         operationsEdges = {
-            "Sobel": 2+2,
-            "Laplacian": 2+2,
-            "Canny": 2+2,
+            "Sobel": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Laplacian": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,1,0,0,0], [0,0,1,-4,1,0,0], [0,0,0,1,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Canny": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt N": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,1,1,1,0,0], [0,0,0,0,0,0,0], [0,0,-1,-1,-1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt NE": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,1,1,0,0], [0,0,-1,0,1,0,0], [0,0,-1,-1,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt E": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,-1,0,1,0,0], [0,0,-1,0,1,0,0], [0,0,-1,0,1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt SE": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,-1,-1,0,0,0], [0,0,-1,0,1,0,0], [0,0,0,1,1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt S": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,-1,-1,-1,0,0], [0,0,0,0,0,0,0], [0,0,1,1,1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt SW": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,-1,-1,0,0], [0,0,1,0,-1,0,0], [0,0,1,1,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt W": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,1,0,-1,0,0], [0,0,1,0,-1,0,0], [0,0,1,0,-1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Prewitt NW": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,1,1,0,0,0], [0,0,1,0,-1,0,0], [0,0,0,-1,-1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
         }
         operationsSharpen = {
-            "Wyostrzająca 1": 2+2,
-            "Wyostrzająca 2": 2+2,
-            "Wyostrzająca 3": 2+2,
-        }
-        operationsEdgesPrewitt = {
-            "Prewitt N": 2+2,
-            "Prewitt NE": 2+2,
-            "Prewitt E": 2+2,
-            "Prewitt SE": 2+2,
-            "Prewitt S": 2+2,
-            "Prewitt SW": 2+2,
-            "Prewitt W": 2+2,
-            "Prewitt NW": 2+2,
+            "Wyostrzająca 1": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,-1,0,0,0], [0,0,-1,5,-1,0,0], [0,0,0,-1,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Wyostrzająca 2": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,-1,-1,-1,0,0], [0,0,-1,9,-1,0,0], [0,0,-1,-1,-1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Wyostrzająca 3": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,1,-2,1,0,0], [0,0,-2,5,-2,0,0], [0,0,1,-2,1,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
         }
         operationsMedian = {
-            "Medianowa 3x3": 2+2,
-            "Medianowa 5x5": 2+2,
-            "Medianowa 7x7": 2+2,
+            "Medianowa 3x3": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Medianowa 5x5": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
+            "Medianowa 7x7": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
         }
         operationsCustom = {
-            "Własna...": 2+2,
+            "Własna...": [[0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0]],
         }
 
-        operationsArray = [operationsSmooth, operationsEdges, operationsSharpen, operationsEdgesPrewitt, operationsMedian, operationsCustom]
+        operationsArray = [operationsSmooth, operationsEdges, operationsSharpen, operationsMedian, operationsCustom]
         self.operations = operationsArray[self.option]
         self.marginPixelsOptions = {
-            "Bez zmian(isolated)": 2+2,
-            "Odbicie lustrzane(reflect)": 2+2,
-            "Powielenie skrajnych pikseli(replicate)": 2+2,
+            "Bez zmian(isolated)": 0,
+            "Odbicie lustrzane(reflect)": 1,
+            "Powielenie skrajnych pikseli(replicate)": 2,
         }
 
     def set_widgets(self):
         self.operationChoice = StringVar(self)
         self.pixelChoice = StringVar(self)
+        self.maskVar = [StringVar(self) for _ in range(49)]
+        self.maskEntries = [Entry(self, textvariable=self.maskVar[i], justify='center', font=("Helvetica", 15), state='disabled'if self.option != 4 else 'normal') for i in range(49)]
 
         self.operationList = OptionMenu(self, self.operationChoice)
         self.marginPixelList = OptionMenu(self, self.pixelChoice)
 
         
         self.operationChoice.set(list(self.operations.keys())[0])
-        self.marginPixelList.set(list(self.marginPixelsOptions.keys())[0])
+        self.pixelChoice.set(list(self.marginPixelsOptions.keys())[0])
         for oper in list(self.operations.keys()):
-            self.operationList['menu'].add_command(label=oper, command=lambda v=oper: self.operationChoice.set(v))
+            self.operationList['menu'].add_command(label=oper, command=lambda v=oper: self.update_mask(v))
         for option in list(self.marginPixelsOptions.keys()):
             self.marginPixelList['menu'].add_command(label=option, command=lambda v=option: self.pixelChoice.set(v))
 
@@ -84,17 +83,26 @@ class NewNeighbourWindow(Toplevel):
     def update_image(self):
         self.cancel()
 
+    def update_mask(self, v):
+        self.operationChoice.set(v)
+        for i in range(7):
+            for j in range(7):
+                self.maskVar[i*7+j].set(self.operations[self.operationChoice.get()][i][j])
+
     def place_widgets(self):
         Label(self, text="Operacja: ").place(relx=0.05, y=7)
-
-        Label(self, text="Piksele skrajne: ").place(relx=0.05, y=77)
-
+        Label(self, text="Piksele skrajne: ").place(relx=0.05, y=42)
         self.operationList.place(y=5, relx=0.35)
         self.marginPixelList.place(y=40, relx=0.35)
 
+        for i in range(7):
+            for j in range(7):
+                self.maskEntries[i*7+j].place(width=50, height=50, x=j*50+25, y=i*50+75)
+                self.maskVar[i*7+j].set(self.operations[self.operationChoice.get()][i][j])
 
-        self.saveButton.place(width=50, height=50, x=0.4, y=340)
-        self.cancelButton.place(width=50, height=50, x=0.6, y=340)
+
+        self.saveButton.place(width=50, height=50, x=125, y=440)
+        self.cancelButton.place(width=50, height=50, x=225, y=440)
 
     def cancel(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)

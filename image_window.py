@@ -8,6 +8,7 @@ from line_profle_window import NewLineProfileWindow
 from slider_window import NewSliderWindow
 from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
+from neighbour_window import NewNeighbourWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -50,6 +51,7 @@ class NewImageWindow(Toplevel):
         self.lutWindow = None
         self.thresholdScaleWindow = None
         self.posterizeWindow = None
+        self.neighborWindow = None
         NewTwoArgsWindow.images[self] = self.name
         for widget in self.master.winfo_children():
             if(type(widget) == NewTwoArgsWindow):
@@ -88,9 +90,10 @@ class NewImageWindow(Toplevel):
         histMan = Menu(topMenu, tearoff=False)
         imageMan = Menu(topMenu, tearoff=False)
         pointOper = Menu(imageMan, tearoff=False)
+        neighborOper = Menu(imageMan, tearoff=False)
         imageMan.add_cascade(label="Jednoargumentowe", menu=pointOper)
         imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=self.create_two_args_window)
-        imageMan.add_command(label="Sąsiedztwa", compound=LEFT, command=2+2)
+        imageMan.add_cascade(label="Sąsiedztwa", menu=neighborOper)
         
         # Opcje OPISU
         self.dsc.add_command(label='Histogram', compound=LEFT, command=self.create_histogram_window)
@@ -105,6 +108,13 @@ class NewImageWindow(Toplevel):
         pointOper.add_command(label="Negacja", compound=LEFT, command=self.negate_image)
         pointOper.add_command(label="Progowanie", compound=LEFT, command=self.threshold_image)
         pointOper.add_command(label="Posteryzacja", compound=LEFT, command=self.posterize_image)
+
+        # Opcje OPERACJI SĄSIEDZTWA
+        neighborOper.add_command(label="Wygładzanie", compound=LEFT, command=lambda:self.create_neighbor_window(0))
+        neighborOper.add_command(label="Detekcja krawędzi", compound=LEFT, command=lambda:self.create_neighbor_window(1))
+        neighborOper.add_command(label="Wyostrzanie", compound=LEFT, command=lambda:self.create_neighbor_window(2))
+        neighborOper.add_command(label="Filtracja medianowa", compound=LEFT, command=lambda:self.create_neighbor_window(3))
+        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_neighbor_window(4))
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Opis", menu=self.dsc)
@@ -121,6 +131,16 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
+    def create_neighbor_window(self, option):
+        for widget in self.master.winfo_children():
+            if(type(widget) == NewNeighbourWindow):
+                if(widget.option == option):
+                    widget.lift()
+                    widget.focus_set()
+                    return
+        wg = NewNeighbourWindow(self, option)
+        wg.focus_set()
+
     def create_two_args_window(self):
         for widget in self.master.winfo_children():
             if(type(widget) == NewTwoArgsWindow):

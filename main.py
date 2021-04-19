@@ -1,8 +1,8 @@
 from tkinter import Tk, Canvas, Menu, mainloop, ttk
+root = Tk()
 from tkinter.constants import LEFT
 from files_options import import_image
 
-root = Tk()
 root.title("APO")
 style = ttk.Style(root)
 style.theme_use('alt')
