@@ -9,7 +9,6 @@ class NewTwoArgsWindow(Toplevel):
         super().__init__(master = master)   
 
         self.set_basic()
-        self.set_operations()
         self.set_widgets()         
 
         
@@ -17,17 +16,8 @@ class NewTwoArgsWindow(Toplevel):
         self.minsize(200, 200)
         self.maxsize(200, 200)
         self.title("Operacje logiczne")
-
-    def set_operations(self):
         self.imageWindow1, self.imageWindow2 = None, None
-        self.operations = {
-            "DODAJ": lambda i:self.imageWindow1.image.add(i),
-            "ODEJMIJ": lambda i:self.imageWindow1.image.sub(i),
-            "ZMIESZAJ": lambda i:self.imageWindow1.image.blend(i),
-            "AND": lambda i:self.imageWindow1.image.bit_and(i),
-            "OR": lambda i:self.imageWindow1.image.bit_or(i),
-            "XOR": lambda i:self.imageWindow1.image.bit_xor(i),
-        }
+        self.operations = ["DODAJ","ODEJMIJ","ZMIESZAJ","AND","OR","XOR"]        
 
     def set_widgets(self):
         self.firstChoice = StringVar(self)
@@ -40,8 +30,8 @@ class NewTwoArgsWindow(Toplevel):
 
         
         self.update_list()
-        self.operationChoice.set(list(self.operations.keys())[0])
-        for oper in list(self.operations.keys()):
+        self.operationChoice.set(self.operations[0])
+        for oper in self.operations:
             self.operationList['menu'].add_command(label=oper, command=lambda v=oper: self.operationChoice.set(v))
 
         self.cbVal = IntVar()
@@ -62,9 +52,8 @@ class NewTwoArgsWindow(Toplevel):
                 self.imageWindow2 = obj
                 break
 
-        outputImage = self.operations[self.operationChoice.get()](self.imageWindow2.image)
+        outputImage = self.imageWindow1.image.twoArgsOperations(self.operationChoice.get(), self.imageWindow2.image)
 
-        #JEŻELI NOWIE OKIENKO TO RÓB NOWE OKIENKO
         if self.cbVal: 
             windowName = self.imageWindow1.name + " " + self.operationChoice.get() + " " + self.imageWindow2.name
             self.imageWindow1.create_another(self.master, None, windowName, ImageSaved(None,outputImage))

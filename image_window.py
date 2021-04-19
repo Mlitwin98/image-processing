@@ -8,7 +8,8 @@ from line_profle_window import NewLineProfileWindow
 from slider_window import NewSliderWindow
 from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
-from neighbour_window import NewNeighbourWindow
+from custom_mask_window import NewCustomMaskWindow
+from border_pixel_asker import NewPixelAsker
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -82,7 +83,7 @@ class NewImageWindow(Toplevel):
 
     # WINDOW
     def duplicate_window(self):
-        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)', self.image)
+        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)', self.image).focus_set()
     
     def place_menu(self):
         topMenu = Menu(self)
@@ -90,7 +91,15 @@ class NewImageWindow(Toplevel):
         histMan = Menu(topMenu, tearoff=False)
         imageMan = Menu(topMenu, tearoff=False)
         pointOper = Menu(imageMan, tearoff=False)
+
         neighborOper = Menu(imageMan, tearoff=False)
+        smooth = Menu(neighborOper, tearoff=False)
+        detectEdges = Menu(neighborOper, tearoff=False)
+        prewitt = Menu(neighborOper, tearoff=False)
+        sharpen = Menu(neighborOper, tearoff=False)
+        medianM = Menu(neighborOper, tearoff=False)
+
+
         imageMan.add_cascade(label="Jednoargumentowe", menu=pointOper)
         imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=self.create_two_args_window)
         imageMan.add_cascade(label="Sąsiedztwa", menu=neighborOper)
@@ -110,11 +119,37 @@ class NewImageWindow(Toplevel):
         pointOper.add_command(label="Posteryzacja", compound=LEFT, command=self.posterize_image)
 
         # Opcje OPERACJI SĄSIEDZTWA
-        neighborOper.add_command(label="Wygładzanie", compound=LEFT, command=lambda:self.create_neighbor_window(0))
-        neighborOper.add_command(label="Detekcja krawędzi", compound=LEFT, command=lambda:self.create_neighbor_window(1))
-        neighborOper.add_command(label="Wyostrzanie", compound=LEFT, command=lambda:self.create_neighbor_window(2))
-        neighborOper.add_command(label="Filtracja medianowa", compound=LEFT, command=lambda:self.create_neighbor_window(3))
-        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_neighbor_window(4))
+        neighborOper.add_cascade(label="Wygładzanie", menu=smooth)
+        neighborOper.add_cascade(label="Detekcja krawędzi", menu=detectEdges)
+        neighborOper.add_cascade(label="Wyostrzanie", menu=sharpen)
+        neighborOper.add_cascade(label="Medianowe", menu=medianM)
+        
+        smooth.add_command(label="Blur", compound=LEFT, command=lambda:self.create_pixel_asker_window("BLUR")) #POZMIENIAĆ COMMANDY
+        smooth.add_command(label="Gaussian Blur", compound=LEFT, command=lambda:self.create_pixel_asker_window("GAUSSIAN"))
+
+        detectEdges.add_command(label="Sobel", compound=LEFT, command=lambda:self.create_pixel_asker_window("SOBEL"))
+        detectEdges.add_command(label="Laplasjan", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN"))
+        detectEdges.add_command(label="Canny", compound=LEFT, command=lambda:self.create_pixel_asker_window("CANNY"))
+        detectEdges.add_cascade(label="Prewitt", menu=prewitt)
+        
+        prewitt.add_command(label="Prewitt N", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW N"))
+        prewitt.add_command(label="Prewitt NE", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW NE"))
+        prewitt.add_command(label="Prewitt E", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW E"))
+        prewitt.add_command(label="Prewitt SE", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW SE"))
+        prewitt.add_command(label="Prewitt S", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW S"))
+        prewitt.add_command(label="Prewitt SW", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW SW"))
+        prewitt.add_command(label="Prewitt W", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW W"))
+        prewitt.add_command(label="Prewitt NW", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW NW"))
+
+        sharpen.add_command(label="Laplasjan 0/-1/5", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN 1"))
+        sharpen.add_command(label="Laplasjan -1/-1/9", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN 2"))
+        sharpen.add_command(label="Laplasjan 1/-2/5", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN 3"))
+
+        medianM.add_command(label="Maska 3x3", compound=LEFT, command=lambda:self.create_pixel_asker_window("MEDIAN 3"))
+        medianM.add_command(label="Maska 5x5", compound=LEFT, command=lambda:self.create_pixel_asker_window("MEDIAN 5"))
+        medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.create_pixel_asker_window("MEDIAN 7"))
+
+        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_custom_mask_window())
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Opis", menu=self.dsc)
@@ -131,14 +166,20 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
-    def create_neighbor_window(self, option):
+    def create_pixel_asker_window(self, command):
         for widget in self.master.winfo_children():
-            if(type(widget) == NewNeighbourWindow):
-                if(widget.option == option):
-                    widget.lift()
-                    widget.focus_set()
-                    return
-        wg = NewNeighbourWindow(self, option)
+            if(type(widget) == NewPixelAsker):
+                widget.destroy()
+        wg = NewPixelAsker(self, command)
+        wg.focus_set()
+
+    def create_custom_mask_window(self):
+        for widget in self.master.winfo_children():
+            if(type(widget) == NewCustomMaskWindow):
+                widget.lift()
+                widget.focus_set()
+                return
+        wg = NewCustomMaskWindow(self)
         wg.focus_set()
 
     def create_two_args_window(self):

@@ -111,42 +111,45 @@ class ImageSaved():
         self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
-    def add(self, imgToAdd):
+    def twoArgsOperations(self, operation, imgToAdd):
         img = imgToAdd.cv2Image
         img = cv2.resize(img, self.cv2Image.shape)
-        return cv2.add(self.cv2Image, img)
 
-    def sub(self, imgToAdd):
-        img = imgToAdd.cv2Image
-        h, w = self.cv2Image.shape
-        dstSize = (w, h)
-        img = cv2.resize(img, dstSize)
-        return cv2.subtract(self.cv2Image, img)
+        operations = {
+            "DODAJ": lambda:cv2.add(self.cv2Image, img),
+            "ODEJMIJ": lambda:cv2.subtract(self.cv2Image, img),
+            "ZMIESZAJ": lambda:cv2.addWeighted(self.cv2Image, 0.7, img, 0.5, -100),
+            "AND": lambda:cv2.bitwise_and(self.cv2Image, img),
+            "OR": lambda:cv2.bitwise_or(self.cv2Image, img),
+            "XOR": lambda:cv2.bitwise_xor(self.cv2Image, img),
+        }
+        
+        return operations[operation]()
 
-    def blend(self, imgToAdd):
-        img = imgToAdd.cv2Image
-        h, w = self.cv2Image.shape
-        dstSize = (w, h)
-        img = cv2.resize(img, dstSize)
-        return cv2.addWeighted(self.cv2Image, 0.7, img, 0.5, -100)
+    def neighborOperations(self, operation, borderPixels):
 
-    def bit_and(self, imgToAdd):
-        img = imgToAdd.cv2Image
-        h, w = self.cv2Image.shape
-        dstSize = (w, h)
-        img = cv2.resize(img, dstSize)
-        return cv2.bitwise_and(self.cv2Image, img)
-
-    def bit_or(self, imgToAdd):
-        img = imgToAdd.cv2Image
-        h, w = self.cv2Image.shape
-        dstSize = (w, h)
-        img = cv2.resize(img, dstSize)
-        return cv2.bitwise_or(self.cv2Image, img)
-
-    def bit_xor(self, imgToAdd):
-        img = imgToAdd.cv2Image
-        h, w = self.cv2Image.shape
-        dstSize = (w, h)
-        img = cv2.resize(img, dstSize)
-        return cv2.bitwise_xor(self.cv2Image, img)
+        operations = {
+            "BLUR": lambda:cv2.blur(self.cv2Image, (5, 5), borderType=borderPixels),
+            "GAUSSIAN": lambda:cv2.GaussianBlur(self.cv2Image, (5,5), 0, borderType=borderPixels),
+            #"SOBEL": lambda:cv2.addWeighted(self.cv2Image, 0.7, img, 0.5, -100),
+            #"LAPLASJAN": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"CANNY": lambda:cv2.bitwise_or(self.cv2Image, img),
+            #"PRW N": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW NE": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW E": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW SE": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW S": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW SW": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW W": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"PRW NW": lambda:cv2.bitwise_xor(self.cv2Image, img),
+            #"LAPLASJAN 1": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"LAPLASJAN 2": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"LAPLASJAN 3": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"MEDIAN 3": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"MEDIAN 5": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"MEDIAN 7": lambda:cv2.bitwise_and(self.cv2Image, img),
+            #"CUSTOM": lambda:cv2.bitwise_and(self.cv2Image, img),
+        }
+        
+        self.cv2Image = operations[operation]()
+        self.fill_histogram()
