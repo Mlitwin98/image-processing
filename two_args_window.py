@@ -1,8 +1,6 @@
 from tkinter import IntVar, Label, StringVar, Toplevel
 from tkinter.ttk import Button, Checkbutton, OptionMenu
 from image_saved import ImageSaved
-
-import numpy as np
 from icons_import import saveIcon, closeIcon
 
 class NewTwoArgsWindow(Toplevel):
