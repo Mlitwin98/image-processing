@@ -1,4 +1,4 @@
-from tkinter import Canvas, Toplevel, Menu
+from tkinter import Canvas, IntVar, Toplevel, Menu
 from tkinter.constants import DISABLED, LEFT, NW, NORMAL
 from PIL import Image, ImageTk
 from image_saved import ImageSaved
@@ -9,7 +9,6 @@ from slider_window import NewSliderWindow
 from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
 from custom_mask_window import NewCustomMaskWindow
-from border_pixel_asker import NewPixelAsker
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -123,33 +122,42 @@ class NewImageWindow(Toplevel):
         neighborOper.add_cascade(label="Detekcja krawędzi", menu=detectEdges)
         neighborOper.add_cascade(label="Wyostrzanie", menu=sharpen)
         neighborOper.add_cascade(label="Medianowe", menu=medianM)
-        
-        smooth.add_command(label="Blur", compound=LEFT, command=lambda:self.create_pixel_asker_window("BLUR")) #POZMIENIAĆ COMMANDY
-        smooth.add_command(label="Gaussian Blur", compound=LEFT, command=lambda:self.create_pixel_asker_window("GAUSSIAN"))
+        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_custom_mask_window(border.get()))
 
-        detectEdges.add_command(label="Sobel", compound=LEFT, command=lambda:self.create_pixel_asker_window("SOBEL"))
-        detectEdges.add_command(label="Laplasjan", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN"))
-        detectEdges.add_command(label="Canny", compound=LEFT, command=lambda:self.create_pixel_asker_window("CANNY"))
+        neighborOper.add_separator()
+        neighborOper.add_command(label="OPCJE SKRAJNYCH PIKSELI", state='disabled', compound=LEFT)
+        border = IntVar(self)
+        border.set(0)
+        neighborOper.add_radiobutton(label="Bez zmian (isolated)", variable=border, value=0)
+        neighborOper.add_radiobutton(label="Odbicie lustrzane (reflect)", variable=border, value=1)
+        neighborOper.add_radiobutton(label="Powielenie skrajnego piksela (replicate)", variable=border, value=2)
+        
+        smooth.add_command(label="Blur", compound=LEFT, command=lambda:self.handle_neighbor_operations("BLUR", border.get())) #POZMIENIAĆ COMMANDY
+        smooth.add_command(label="Gaussian Blur", compound=LEFT, command=lambda:self.handle_neighbor_operations("GAUSSIAN", border.get()))
+
+        detectEdges.add_command(label="Sobel", compound=LEFT, command=lambda:self.handle_neighbor_operations("SOBEL", border.get()))
+        detectEdges.add_command(label="Laplasjan", compound=LEFT, command=lambda:self.handle_neighbor_operations("LAPLASJAN", border.get()))
+        detectEdges.add_command(label="Canny", compound=LEFT, command=lambda:self.handle_neighbor_operations("CANNY", border.get()))
         detectEdges.add_cascade(label="Prewitt", menu=prewitt)
         
-        prewitt.add_command(label="Prewitt N", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW N"))
-        prewitt.add_command(label="Prewitt NE", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW NE"))
-        prewitt.add_command(label="Prewitt E", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW E"))
-        prewitt.add_command(label="Prewitt SE", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW SE"))
-        prewitt.add_command(label="Prewitt S", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW S"))
-        prewitt.add_command(label="Prewitt SW", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW SW"))
-        prewitt.add_command(label="Prewitt W", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW W"))
-        prewitt.add_command(label="Prewitt NW", compound=LEFT, command=lambda:self.create_pixel_asker_window("PRW NW"))
+        prewitt.add_command(label="Prewitt N", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW N", border.get()))
+        prewitt.add_command(label="Prewitt NE", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW NE", border.get()))
+        prewitt.add_command(label="Prewitt E", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW E", border.get()))
+        prewitt.add_command(label="Prewitt SE", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW SE", border.get()))
+        prewitt.add_command(label="Prewitt S", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW S", border.get()))
+        prewitt.add_command(label="Prewitt SW", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW SW", border.get()))
+        prewitt.add_command(label="Prewitt W", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW W", border.get()))
+        prewitt.add_command(label="Prewitt NW", compound=LEFT, command=lambda:self.handle_neighbor_operations("PRW NW", border.get()))
 
-        sharpen.add_command(label="Laplasjan 0/-1/5", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN 1"))
-        sharpen.add_command(label="Laplasjan -1/-1/9", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN 2"))
-        sharpen.add_command(label="Laplasjan 1/-2/5", compound=LEFT, command=lambda:self.create_pixel_asker_window("LAPLASJAN 3"))
+        sharpen.add_command(label="Laplasjan 0/-1/5", compound=LEFT, command=lambda:self.handle_neighbor_operations("LAPLASJAN 1", border.get()))
+        sharpen.add_command(label="Laplasjan -1/-1/9", compound=LEFT, command=lambda:self.handle_neighbor_operations("LAPLASJAN 2", border.get()))
+        sharpen.add_command(label="Laplasjan 1/-2/5", compound=LEFT, command=lambda:self.handle_neighbor_operations("LAPLASJAN 3", border.get()))
 
-        medianM.add_command(label="Maska 3x3", compound=LEFT, command=lambda:self.create_pixel_asker_window("MEDIAN 3"))
-        medianM.add_command(label="Maska 5x5", compound=LEFT, command=lambda:self.create_pixel_asker_window("MEDIAN 5"))
-        medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.create_pixel_asker_window("MEDIAN 7"))
+        medianM.add_command(label="Maska 3x3", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 3", border.get()))
+        medianM.add_command(label="Maska 5x5", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 5", border.get()))
+        medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 7", border.get()))
 
-        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_custom_mask_window())
+        
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Opis", menu=self.dsc)
@@ -166,13 +174,6 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
-    def create_pixel_asker_window(self, command):
-        for widget in self.master.winfo_children():
-            if(type(widget) == NewPixelAsker):
-                widget.destroy()
-        wg = NewPixelAsker(self, command)
-        wg.focus_set()
-
     def create_custom_mask_window(self):
         for widget in self.master.winfo_children():
             if(type(widget) == NewCustomMaskWindow):
@@ -256,6 +257,11 @@ class NewImageWindow(Toplevel):
             self.posterizeWindow = NewPosterizeWindow(self.name, self)
             self.update_visible_image()
             self.update_child_windows()
+
+    def handle_neighbor_operations(self, operation, borderOption):
+        self.image.neighborOperations(operation, borderOption)
+        self.update_visible_image()
+        self.update_child_windows()
     # -------------------
 
 

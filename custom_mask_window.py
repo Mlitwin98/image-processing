@@ -4,9 +4,9 @@ from tkinter.ttk import Button
 from icons_import import saveIcon, closeIcon
 
 class NewCustomMaskWindow(Toplevel):
-    def __init__(self, master = None, command=None): 
+    def __init__(self, master = None, borderPixels=None): 
         super().__init__(master = master)   
-        self.command = command
+        self.borderPixels = borderPixels
         self.set_basic()
         self.set_widgets()         
 

@@ -10,7 +10,8 @@ NOWE:
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
-2. Złe rozmiary okienka, nie mieści małych obrazków
+2. Złe rozmiary okienka, nie mieści małych obrazków??
+3. Sobel i maski wyostrzające nie działają poprawnie?
 
 NA RAZIE NIE ZADANE ALE WAŻNE:
 1. Zapisywanie
@@ -21,7 +22,7 @@ DO ZROBIENIA Z OLĄ:
 
 DO SPYTANIA:
 1. Czy blend pyta o alfa, beta, gamma
+2. Co z tym Sobelem i wyostrzającymi? Czy to tak ma być?
 
 NEXT:
-UZUPEŁNIĆ OPCJE W image_saved -> neighborOper
-OBSŁUŻYĆ CUSTOMOWĄ MASKĘ
+OBSŁUŻYĆ CUSTOMOWĄ MASKĘ (W TYM SPRAWDZANIE CZY POPRAWNE DANE)
