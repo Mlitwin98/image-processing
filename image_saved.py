@@ -35,6 +35,7 @@ class ImageSaved():
         return False
 
     def fill_histogram(self):
+        self.copy = copy.deepcopy(self.cv2Image)
         if self.isGrayScale:
             self.lut = np.zeros(shape=256).astype(int)
             h, w = self.cv2Image.shape
@@ -52,7 +53,6 @@ class ImageSaved():
     def negate(self):
         maxVal = np.amax(self.cv2Image)
         self.cv2Image = maxVal - self.cv2Image
-        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def threshold(self, level, keep_val):
@@ -92,7 +92,6 @@ class ImageSaved():
                 cumulativeSum = (((cumulativeSum-minVal)*255)/(maxVal - minVal)).astype(np.uint8)
                 self.cv2Image[:,canal] = cumulativeSum[self.cv2Image[:,canal]]
 
-        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def stretch(self):
@@ -109,7 +108,6 @@ class ImageSaved():
         func = np.vectorize(calculate)
         self.cv2Image = func(self.cv2Image)
 
-        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def twoArgsOperations(self, operation, imgToAdd):
@@ -127,7 +125,7 @@ class ImageSaved():
         
         return operations[operation]()
 
-    def neighborOperations(self, operation, borderOption):
+    def neighborOperations(self, operation, borderOption, customMask=None):
         outputType = cv2.CV_64F
         border = [cv2.BORDER_ISOLATED, cv2.BORDER_REFLECT, cv2.BORDER_REPLICATE]
         borderPixels = border[borderOption]
@@ -135,7 +133,7 @@ class ImageSaved():
         operations = {
             "BLUR": lambda:cv2.blur(self.cv2Image, (5, 5), borderType=borderPixels),
             "GAUSSIAN": lambda:cv2.GaussianBlur(self.cv2Image, (5,5), 0, borderType=borderPixels),
-            "SOBEL": lambda:self.handleSobel(outputType, borderPixels), #BABOL
+            "SOBEL": lambda:self.handleSobel(outputType, borderPixels), #BABOL?
             "LAPLASJAN": lambda:cv2.Laplacian(self.cv2Image, outputType, ksize=3, borderType=borderPixels),
             "CANNY": lambda:cv2.Canny(self.cv2Image, 100, 200),
             "PRW N": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittN, borderType=borderPixels),
@@ -146,13 +144,13 @@ class ImageSaved():
             "PRW SW": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittSW, borderType=borderPixels),
             "PRW W": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittW, borderType=borderPixels),
             "PRW NW": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittNW, borderType=borderPixels),
-            "LAPLASJAN 1": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp1, borderType=borderPixels), #BABOL
-            "LAPLASJAN 2": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp2, borderType=borderPixels), #BABOL
-            "LAPLASJAN 3": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp3, borderType=borderPixels), #BABOL
+            "LAPLASJAN 1": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp1, borderType=borderPixels), #BABOL?
+            "LAPLASJAN 2": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp2, borderType=borderPixels), #BABOL?
+            "LAPLASJAN 3": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp3, borderType=borderPixels), #BABOL?
             "MEDIAN 3": lambda:cv2.medianBlur(self.cv2Image, 3),
             "MEDIAN 5": lambda:cv2.medianBlur(self.cv2Image, 5),
             "MEDIAN 7": lambda:cv2.medianBlur(self.cv2Image, 7),
-            #"CUSTOM": lambda:cv2.bitwise_and(self.cv2Image, img),
+            "CUSTOM": lambda:cv2.filter2D(self.cv2Image, outputType, customMask, borderType=borderPixels),
         }
         
         self.cv2Image = np.uint8(np.absolute(operations[operation]()))

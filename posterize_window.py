@@ -49,7 +49,6 @@ class NewPosterizeWindow(Toplevel):
         self.master.update_visible_image()
 
     def update_image(self):
-        self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
         self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()

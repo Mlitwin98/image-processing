@@ -1,12 +1,14 @@
 import copy
-from tkinter import Entry, StringVar, Toplevel
+from tkinter import StringVar, Toplevel, messagebox ,Spinbox
 from tkinter.ttk import Button
+
+from numpy import int64
+from numpy.core.fromnumeric import reshape, sum, all
 from icons_import import saveIcon, closeIcon
 
 class NewCustomMaskWindow(Toplevel):
-    def __init__(self, master = None, borderPixels=None): 
-        super().__init__(master = master)   
-        self.borderPixels = borderPixels
+    def __init__(self, master=None): 
+        super().__init__(master = master)
         self.set_basic()
         self.set_widgets()         
 
@@ -14,11 +16,11 @@ class NewCustomMaskWindow(Toplevel):
     def set_basic(self):
         self.minsize(300, 300)
         self.maxsize(300, 300)
-        self.title("Operacje sąsiedztwa")
+        self.title("Własna maska")
 
     def set_widgets(self):
-        self.maskVar = [StringVar(self) for _ in range(49)]
-        self.maskEntries = [Entry(self, textvariable=self.maskVar[i], justify='center', font=("Helvetica", 15)) for i in range(49)]
+        self.maskVar = [StringVar(self, value="0") for _ in range(9)]
+        self.maskEntries = [Spinbox(self, justify='center', font=("Helvetica", 15), from_=-9999, to=9999, textvariable=self.maskVar[i]) for i in range(9)]
 
         self.saveButton = Button(self, image=saveIcon, command=self.update_image)
         self.cancelButton = Button(self, image=closeIcon, command=self.cancel)
@@ -26,23 +28,45 @@ class NewCustomMaskWindow(Toplevel):
         self.place_widgets()
 
     def update_image(self):
-        self.cancel()
+        mask = self.getMask()
+        if mask is None:
+            messagebox.showerror("Błąd", "Wprowadź poprawą maskę")
+            self.lift()
+            self.focus_set()
+            return
+        else:
+            self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
+            self.master.update_visible_image()
+            self.master.update_child_windows()
+            self.cancel()
 
     def place_widgets(self):
         for i in range(3):
             for j in range(3):
                 self.maskEntries[i*3+j].place(width=80, height=80, x=j*80+30, y=i*80+5)
-                self.maskVar[i*3+j].set(0)
 
 
-        self.saveButton.place(width=40, height=40, x=125, y=255)
-        self.cancelButton.place(width=40, height=40, x=225, y=255)
+        self.saveButton.place(width=40, height=40, x=70, y=255)
+        self.cancelButton.place(width=40, height=40, x=190, y=255)
 
     def cancel(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
         self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()
-        self.master.thresholdScaleWindow = None
         self.destroy()   
         
+    def getMask(self):
+        try:
+            values = [int(val.get()) for val in self.maskVar]
+        except ValueError:
+            return None
+
+        mask = reshape(values, (3,3))
+        if all(mask==0):
+            return None
+        else:
+            if sum(mask) != 0:
+                mask = int64(mask)/sum(mask)
+
+            return mask

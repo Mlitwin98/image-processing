@@ -1,12 +1,5 @@
 NOWE:
 1. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax
-2. Operacje sąsiedztwa (zadbać o brzegowe na 3 sposoby):
-    a) blur, gaussianBlur
-    b) Detekcja krawędzi - Sobel, Laplacian, Canny
-    c) Wyostrzanie [[0,-1,0],[-1,5,-1],[0,-1,0]] [[-1,-1,-1],[-1,9,-1],[-1,-1,-1]] [[1,-2, 1],[-2,5,-2],[1,-2, 1]] 
-    d) Kierunkowa detekcja krawędzi - Prewitt (kierunki: N, NE, E, SE, S, SW, W, NW)
-    e) Interaktywne 3x3
-3. Filtracja medianowa do wyboru 3x3, 5x5, 7x7 (zadbać o brzegowe na 3 sposoby)
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
@@ -23,6 +16,6 @@ DO ZROBIENIA Z OLĄ:
 DO SPYTANIA:
 1. Czy blend pyta o alfa, beta, gamma
 2. Co z tym Sobelem i wyostrzającymi? Czy to tak ma być?
+3. Czy jeżeli suma w masce = 0 to wywalamy po prostu błąd i pytamy dalej?
 
 NEXT:
-OBSŁUŻYĆ CUSTOMOWĄ MASKĘ (W TYM SPRAWDZANIE CZY POPRAWNE DANE)

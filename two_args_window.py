@@ -73,10 +73,8 @@ class NewTwoArgsWindow(Toplevel):
             return
         openFilesNames = list(NewTwoArgsWindow.images.values())
         self.firstChoice.set(openFilesNames[0])
-        if len(NewTwoArgsWindow.images) == 1:
-            self.secondChoice.set(openFilesNames[0]) 
-        else:
-            self.secondChoice.set(openFilesNames[1])  
+        self.secondChoice.set(openFilesNames[0]) if len(NewTwoArgsWindow.images) == 1 else self.secondChoice.set(openFilesNames[1]) 
+             
 
         self.firstImageList['menu'].delete(0, 'end')
         self.secondImageList['menu'].delete(0, 'end')
