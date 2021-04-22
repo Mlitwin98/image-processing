@@ -53,6 +53,7 @@ class ImageSaved():
     def negate(self):
         maxVal = np.amax(self.cv2Image)
         self.cv2Image = maxVal - self.cv2Image
+        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def threshold(self, level, keep_val):
@@ -94,20 +95,24 @@ class ImageSaved():
 
         self.fill_histogram()
 
-    def stretch(self):
-        minImg = np.amin(self.cv2Image)
-        maxImg = np.amax(self.cv2Image)
-
-
-        newMax = 255
-        newMin = 0
+    def stretch(self, oldMin=None, oldMax=None, newMini=None, newMaxi=None):
+        if all(v is None for v in (oldMin, oldMax, newMini, newMaxi)):
+            minImg = np.amin(self.cv2Image)
+            maxImg = np.amax(self.cv2Image)
+            newMax = 255
+            newMin = 0
+        else:
+            minImg = oldMin
+            maxImg = oldMax
+            newMax = newMaxi
+            newMin = newMini
 
         def calculate(oldPixel):
             return int(((oldPixel-minImg) * newMax)/(maxImg-minImg))
 
         func = np.vectorize(calculate)
-        self.cv2Image = func(self.cv2Image)
-
+        self.cv2Image = np.where(np.logical_and(self.copy >= minImg, self.copy <= maxImg), func(self.cv2Image), self.copy) 
+        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def twoArgsOperations(self, operation, imgToAdd):
@@ -154,7 +159,6 @@ class ImageSaved():
         }
         
         self.cv2Image = np.uint8(np.absolute(operations[operation]()))
-        self.fill_histogram()
 
     def handleSobel(self, dtype, borderPixels):
         sobelx = cv2.Sobel(self.cv2Image,dtype, 1,0,ksize=5, borderType=borderPixels)

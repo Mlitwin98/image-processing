@@ -9,6 +9,7 @@ from slider_window import NewSliderWindow
 from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
 from custom_mask_window import NewCustomMaskWindow
+from custom_stretch_window import NewCustomStretchWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -25,6 +26,7 @@ class NewImageWindow(Toplevel):
         self.place_menu()
         self.manage_line_profile()
         self.bind_functions()
+        self.resize_img(None)
 
     # BASICS
     def create_another(self, master, pathToImage, name, image):
@@ -110,6 +112,7 @@ class NewImageWindow(Toplevel):
 
         # Opcje MANIPULACJI HISTOGRAMEM
         histMan.add_command(label="Rozciąganie", compound=LEFT, command=self.stretch_image)
+        histMan.add_command(label="Rozciąganie przedziałami", compound=LEFT, command=self.create_stretching_window)
         histMan.add_command(label="Wyrównanie", compound=LEFT, command=self.equalize_image)
 
         # Opcje OPERACJI JEDNOARGUMENTOWYCH
@@ -208,6 +211,15 @@ class NewImageWindow(Toplevel):
                 return
         self.histogramWindow = NewHistogramWindow(self.name, self)
 
+    def create_stretching_window(self):
+        for widget in self.winfo_children():
+            if(type(widget) == NewCustomStretchWindow):
+                widget.lift()
+                widget.focus_set()
+                return
+        wg = NewCustomStretchWindow(self)
+        wg.focus_set()
+
     def create_lut_window(self):
         for widget in self.winfo_children():
             if(type(widget) == NewLutWindow):
@@ -238,8 +250,8 @@ class NewImageWindow(Toplevel):
         self.update_visible_image()
         self.update_child_windows()
 
-    def stretch_image(self):
-        self.image.stretch()
+    def stretch_image(self, oldMin=None, oldMax=None, newMini=None, newMaxi=None):
+        self.image.stretch(oldMin, oldMax, newMini, newMaxi)
         self.update_visible_image()
         self.update_child_windows()
 
@@ -261,6 +273,7 @@ class NewImageWindow(Toplevel):
     def handle_neighbor_operations(self, operation, borderOption):
         self.image.neighborOperations(operation, borderOption)
         self.update_visible_image()
+        self.image.fill_histogram()
         self.update_child_windows()
     # -------------------
 

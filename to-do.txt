@@ -1,5 +1,4 @@
 NOWE:
-1. Rozciąganie zakresu; z zakresu p1-p2 do zakresu q3-q4, w szczególności gdy q3=0, q4=Lmax
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
@@ -14,8 +13,7 @@ DO ZROBIENIA Z OLĄ:
 1. 
 
 DO SPYTANIA:
-1. Czy blend pyta o alfa, beta, gamma
+1. Co z funkcjami w których wklepałem na sztywno(Czy blend pyta o alfa, beta, gamma. To samo Canny)
 2. Co z tym Sobelem i wyostrzającymi? Czy to tak ma być?
-3. Czy jeżeli suma w masce = 0 to wywalamy po prostu błąd i pytamy dalej?
 
 NEXT:
