@@ -18,7 +18,7 @@ class NewImageWindow(Toplevel):
         if pathToImage is not None and image is None:
             self.pathToImage = pathToImage
             self.image = ImageSaved(pathToImage)
-        elif image is not None and pathToImage is None:
+        elif image is not None:
             self.image = image
         self.set_images()
         self.set_geometry()
@@ -26,15 +26,14 @@ class NewImageWindow(Toplevel):
         self.place_menu()
         self.manage_line_profile()
         self.bind_functions()
-        self.resize_img(None)
 
     # BASICS
     def create_another(self, master, pathToImage, name, image):
         NewImageWindow(master, pathToImage, name, image)
 
     def set_geometry(self):
-        self.geometry('{}x{}'.format(self.imageFromArray.width, self.imageFromArray.height))
         self.minsize(self.imageFromArray.width, self.imageFromArray.height)
+        self.geometry('{}x{}'.format(self.imageFromArray.width, self.imageFromArray.height)) 
     
     def set_images(self):        
         self.imageFromArray = Image.fromarray(self.image.cv2Image)
@@ -84,12 +83,13 @@ class NewImageWindow(Toplevel):
 
     # WINDOW
     def duplicate_window(self):
-        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)', self.image).focus_set()
+        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)').focus_set()
     
     def place_menu(self):
         topMenu = Menu(self)
         self.dsc = Menu(topMenu, tearoff=False)
         histMan = Menu(topMenu, tearoff=False)
+        
         imageMan = Menu(topMenu, tearoff=False)
         pointOper = Menu(imageMan, tearoff=False)
 
@@ -273,7 +273,6 @@ class NewImageWindow(Toplevel):
     def handle_neighbor_operations(self, operation, borderOption):
         self.image.neighborOperations(operation, borderOption)
         self.update_visible_image()
-        self.image.fill_histogram()
         self.update_child_windows()
     # -------------------
 

@@ -138,29 +138,39 @@ class ImageSaved():
         operations = {
             "BLUR": lambda:cv2.blur(self.cv2Image, (5, 5), borderType=borderPixels),
             "GAUSSIAN": lambda:cv2.GaussianBlur(self.cv2Image, (5,5), 0, borderType=borderPixels),
-            "SOBEL": lambda:self.handleSobel(outputType, borderPixels), #BABOL?
-            "LAPLASJAN": lambda:cv2.Laplacian(self.cv2Image, outputType, ksize=3, borderType=borderPixels),
+            "SOBEL": lambda:self.handleSobel(outputType, borderPixels),
+            "LAPLASJAN": lambda:self.normalize(cv2.Laplacian(self.cv2Image, outputType, ksize=3, borderType=borderPixels)),
             "CANNY": lambda:cv2.Canny(self.cv2Image, 100, 200),
-            "PRW N": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittN, borderType=borderPixels),
-            "PRW NE": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittNE, borderType=borderPixels),
-            "PRW E": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittE, borderType=borderPixels),
-            "PRW SE": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittSE, borderType=borderPixels),
-            "PRW S": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittS, borderType=borderPixels),
-            "PRW SW": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittSW, borderType=borderPixels),
-            "PRW W": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittW, borderType=borderPixels),
-            "PRW NW": lambda:cv2.filter2D(self.cv2Image, outputType, mask_prewittNW, borderType=borderPixels),
-            "LAPLASJAN 1": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp1, borderType=borderPixels), #BABOL?
-            "LAPLASJAN 2": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp2, borderType=borderPixels), #BABOL?
-            "LAPLASJAN 3": lambda:cv2.filter2D(self.cv2Image, outputType, mask_sharp3, borderType=borderPixels), #BABOL?
+            "PRW N": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittN, borderType=borderPixels)),
+            "PRW NE": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittNE, borderType=borderPixels)),
+            "PRW E": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittE, borderType=borderPixels)),
+            "PRW SE": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittSE, borderType=borderPixels)),
+            "PRW S": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittS, borderType=borderPixels)),
+            "PRW SW": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittSW, borderType=borderPixels)),
+            "PRW W": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittW, borderType=borderPixels)),
+            "PRW NW": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittNW, borderType=borderPixels)),
+            "LAPLASJAN 1": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_sharp1, borderType=borderPixels)), #BABOL?
+            "LAPLASJAN 2": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_sharp2, borderType=borderPixels)), #BABOL?
+            "LAPLASJAN 3": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_sharp3, borderType=borderPixels)), #BABOL?
             "MEDIAN 3": lambda:cv2.medianBlur(self.cv2Image, 3),
             "MEDIAN 5": lambda:cv2.medianBlur(self.cv2Image, 5),
             "MEDIAN 7": lambda:cv2.medianBlur(self.cv2Image, 7),
             "CUSTOM": lambda:cv2.filter2D(self.cv2Image, outputType, customMask, borderType=borderPixels),
         }
         
-        self.cv2Image = np.uint8(np.absolute(operations[operation]()))
+        self.cv2Image = operations[operation]()
+        self.copy = copy.deepcopy(self.cv2Image)
+        self.fill_histogram()
 
     def handleSobel(self, dtype, borderPixels):
         sobelx = cv2.Sobel(self.cv2Image,dtype, 1,0,ksize=5, borderType=borderPixels)
         sobely = cv2.Sobel(self.cv2Image,dtype, 0,1,ksize=5, borderType=borderPixels)
-        return cv2.hconcat((sobelx, sobely))
+        scaled_x = self.normalize(sobelx)
+        scaled_y = self.normalize(sobely)
+        return cv2.hconcat((scaled_x, scaled_y))
+
+    def normalize(self, input):
+        abs_input = np.absolute(input)
+        scaled_input = np.uint8(255*abs_input/np.max(abs_input))
+        return scaled_input
+        
