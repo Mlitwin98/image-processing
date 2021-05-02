@@ -40,7 +40,6 @@ class NewCustomMaskWindow(Toplevel):
             self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
             self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
             self.master.update_visible_image()
-            self.master.image.fill_histogram()
             self.master.update_child_windows()
             self.destroy()
 
@@ -52,6 +51,7 @@ class NewCustomMaskWindow(Toplevel):
             self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
             self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
             self.master.update_visible_image()
+            self.master.update_child_windows()
 
     def place_widgets(self):
         for i in range(3):

@@ -1,10 +1,13 @@
 NOWE:
+2. Maska 5x5 z dwóch masek 3x3
+3. Szkieletyzacja
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
 2. Złe rozmiary okienka, nie mieści małych obrazków??
 3. POPRAWIĆ INSTALATOR I IMPORTY (100MB!!!!) python -O -m PyInstaller -F --clean main.spec
 4. Czy ikonki potrzebne? Ewentualnie sprawdzić jak importować
+5. Usunąłem zmianę kopii z fill_histogram() CZY TO SPRAWI BŁĘDY??
 
 NA RAZIE NIE ZADANE ALE WAŻNE:
 1. Zapisywanie
@@ -14,6 +17,6 @@ DO ZROBIENIA Z OLĄ:
 1. 
 
 DO SPYTANIA:
-1. Co z funkcjami w których wklepałem na sztywno(Czy blend pyta o alfa, beta, gamma. To samo Canny)
+1. Co z funkcjami w których wklepałem na sztywno(Czy blend pyta o alfa, beta, gamma. To samo Canny) - Może być, ale lepiej okienka pytające o to
 
 NEXT:

@@ -1,4 +1,4 @@
-from tkinter import Canvas, IntVar, Toplevel, Menu
+from tkinter import Canvas, IntVar, Toplevel, Menu, messagebox
 from tkinter.constants import DISABLED, LEFT, NW, NORMAL
 from PIL import Image, ImageTk
 from image_saved import ImageSaved
@@ -10,6 +10,7 @@ from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
 from custom_mask_window import NewCustomMaskWindow
 from custom_stretch_window import NewCustomStretchWindow
+from morph_window import NewMorphWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -100,10 +101,13 @@ class NewImageWindow(Toplevel):
         sharpen = Menu(neighborOper, tearoff=False)
         medianM = Menu(neighborOper, tearoff=False)
 
+        morphOper = Menu(imageMan, tearoff=False)
+
 
         imageMan.add_cascade(label="Jednoargumentowe", menu=pointOper)
         imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=self.create_two_args_window)
         imageMan.add_cascade(label="Sąsiedztwa", menu=neighborOper)
+        imageMan.add_command(label="Morfologiczne", compound=LEFT, command=self.create_morph_window)
         
         # Opcje OPISU
         self.dsc.add_command(label='Histogram', compound=LEFT, command=self.create_histogram_window)
@@ -130,7 +134,7 @@ class NewImageWindow(Toplevel):
         neighborOper.add_separator()
         neighborOper.add_command(label="OPCJE SKRAJNYCH PIKSELI", state='disabled', compound=LEFT)
         self.border = IntVar(self)
-        self.border.set(0)
+        self.border.set(2)
         neighborOper.add_radiobutton(label="Bez zmian (isolated)", variable=self.border, value=0)
         neighborOper.add_radiobutton(label="Odbicie lustrzane (reflect)", variable=self.border, value=1)
         neighborOper.add_radiobutton(label="Powielenie skrajnego piksela (replicate)", variable=self.border, value=2)
@@ -158,9 +162,7 @@ class NewImageWindow(Toplevel):
 
         medianM.add_command(label="Maska 3x3", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 3", self.border.get()))
         medianM.add_command(label="Maska 5x5", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 5", self.border.get()))
-        medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 7", self.border.get()))
-
-        
+        medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 7", self.border.get()))        
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Opis", menu=self.dsc)
@@ -177,6 +179,18 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
+    def create_morph_window(self):
+        if not self.image.check_if_binary():
+            messagebox.showerror("Błąd", "Obraz musi być binarny. Wykonaj posteryzację dla 2 i spróbuj ponownie.")
+            return
+        for widget in self.winfo_children():
+            if(type(widget) == NewMorphWindow):
+                widget.lift()
+                widget.focus_set()
+                return
+        wg = NewMorphWindow(self)
+        wg.focus_set()
+
     def create_custom_mask_window(self):
         for widget in self.winfo_children():
             if(type(widget) == NewCustomMaskWindow):
@@ -196,19 +210,17 @@ class NewImageWindow(Toplevel):
         wg.focus_set()
 
     def create_profile_window(self):
-        for widget in self.winfo_children():
-            if(type(widget) == NewLineProfileWindow):
-                widget.lift()
-                widget.focus_set()
-                return
+        if(self.profileWindow is not None):
+            self.profileWindow.lift()
+            self.profileWindow.focus_set()
+            return
         self.profileWindow = NewLineProfileWindow(self.name, self.lineCoords, self)
         
     def create_histogram_window(self):
-        for widget in self.winfo_children():
-            if(type(widget) == NewHistogramWindow):
-                widget.lift()
-                widget.focus_set()
-                return
+        if(self.histogramWindow is not None):
+            self.histogramWindow.lift()
+            self.histogramWindow.focus_set()
+            return
         self.histogramWindow = NewHistogramWindow(self.name, self)
 
     def create_stretching_window(self):
@@ -221,11 +233,10 @@ class NewImageWindow(Toplevel):
         wg.focus_set()
 
     def create_lut_window(self):
-        for widget in self.winfo_children():
-            if(type(widget) == NewLutWindow):
-                widget.lift()
-                widget.focus_set()
-                return
+        if(self.lutWindow is not None):
+            self.lutWindow.lift()
+            self.lutWindow.focus_set()
+            return
         self.lutWindow = NewLutWindow(self.name, self)
 
     def update_child_windows(self):
@@ -234,6 +245,9 @@ class NewImageWindow(Toplevel):
 
         if self.lutWindow is not None:
             self.lutWindow.display_lut_values()
+
+        if self.profileWindow is not None:
+            self.profileWindow.update_line(self.lineCoords)
 
     def resize_child_windows(self):
         offsetX = self.winfo_rootx()-self.winfo_x()

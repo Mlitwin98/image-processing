@@ -34,8 +34,16 @@ class ImageSaved():
         if (b==g).all() and (b==r).all(): return True
         return False
 
+    def check_if_binary(self):
+        if not self.isGrayScale:
+            print("Not gray")
+            return False
+        else:
+            white_pix = np.sum(self.cv2Image == 255)
+            black_pix = np.sum(self.cv2Image == 0)
+            return self.cv2Image.shape[0]*self.cv2Image.shape[1] == white_pix+black_pix #EWENTUALNIE LOOP PRZEZ HISTOGRAM I SPRAWDZANIE WARTOŚCI[1:254]
+
     def fill_histogram(self):
-        self.copy = copy.deepcopy(self.cv2Image)
         if self.isGrayScale:
             self.lut = np.zeros(shape=256).astype(int)
             h, w = self.cv2Image.shape
@@ -132,8 +140,7 @@ class ImageSaved():
 
     def neighborOperations(self, operation, borderOption, customMask=None):
         outputType = cv2.CV_64F
-        border = [cv2.BORDER_ISOLATED, cv2.BORDER_REFLECT, cv2.BORDER_REPLICATE]
-        borderPixels = border[borderOption]
+        borderPixels = [cv2.BORDER_ISOLATED, cv2.BORDER_REFLECT, cv2.BORDER_REPLICATE][borderOption]
 
         operations = {
             "BLUR": lambda:cv2.blur(self.cv2Image, (5, 5), borderType=borderPixels),
@@ -173,4 +180,16 @@ class ImageSaved():
         abs_input = np.absolute(input)
         scaled_input = np.uint8(255*abs_input/np.max(abs_input))
         return scaled_input
-        
+
+    def morphOperations(self, operation, shape, size, borderOption):
+        kernel = np.ones((size, size), np.uint8) if shape=="KWADRAT" else np.uint8(np.add.outer(*[np.r_[:size//2,size//2:-1:-1]]*2)>=size//2)
+        borderPixels = [cv2.BORDER_ISOLATED, cv2.BORDER_REFLECT, cv2.BORDER_REPLICATE][borderOption]
+        operations = {
+            "EROZJA": lambda: cv2.erode(self.cv2Image, kernel, iterations=2, borderType=borderPixels),
+            "DYLACJA": lambda: cv2.dilate(self.cv2Image, kernel, iterations=2, borderType=borderPixels),
+            "OTWARCIE": lambda: cv2.morphologyEx(self.cv2Image, cv2.MORPH_OPEN, kernel, iterations=2, borderType=borderPixels),
+            "ZAMKNIĘCIE": lambda: cv2.morphologyEx(self.cv2Image, cv2.MORPH_CLOSE, kernel, iterations=2, borderType=borderPixels),
+        }
+
+        self.cv2Image = operations[operation]()
+        self.fill_histogram()
