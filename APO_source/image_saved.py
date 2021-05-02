@@ -41,7 +41,7 @@ class ImageSaved():
         else:
             white_pix = np.sum(self.cv2Image == 255)
             black_pix = np.sum(self.cv2Image == 0)
-            return self.cv2Image.shape[0]*self.cv2Image.shape[1] == white_pix+black_pix #EWENTUALNIE LOOP PRZEZ HISTOGRAM I SPRAWDZANIE WARTOŚCI[1:254]
+            return self.cv2Image.shape[0]*self.cv2Image.shape[1] == white_pix+black_pix
 
     def fill_histogram(self):
         if self.isGrayScale:
@@ -162,11 +162,10 @@ class ImageSaved():
             "MEDIAN 3": lambda:cv2.medianBlur(self.cv2Image, 3),
             "MEDIAN 5": lambda:cv2.medianBlur(self.cv2Image, 5),
             "MEDIAN 7": lambda:cv2.medianBlur(self.cv2Image, 7),
-            "CUSTOM": lambda:cv2.filter2D(self.cv2Image, outputType, customMask, borderType=borderPixels),
+            "CUSTOM": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, customMask, borderType=borderPixels)),
         }
         
         self.cv2Image = operations[operation]()
-        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def handleSobel(self, dtype, borderPixels):
@@ -189,7 +188,21 @@ class ImageSaved():
             "DYLACJA": lambda: cv2.dilate(self.cv2Image, kernel, iterations=2, borderType=borderPixels),
             "OTWARCIE": lambda: cv2.morphologyEx(self.cv2Image, cv2.MORPH_OPEN, kernel, iterations=2, borderType=borderPixels),
             "ZAMKNIĘCIE": lambda: cv2.morphologyEx(self.cv2Image, cv2.MORPH_CLOSE, kernel, iterations=2, borderType=borderPixels),
+            "SZKIELETYZACJA": lambda: self.handleSkeletonize(borderPixels),
         }
 
         self.cv2Image = operations[operation]()
         self.fill_histogram()
+
+    def handleSkeletonize(self, borderPixels):
+        skel = np.zeros(self.cv2Image.shape, np.uint8)
+        kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
+        tmp_copy = copy.deepcopy(self.cv2Image)
+        while True:
+            im_open = cv2.morphologyEx(tmp_copy, cv2.MORPH_OPEN, kernel, borderType=borderPixels)
+            im_temp = cv2.subtract(tmp_copy, im_open)
+            im_eroded = cv2.erode(tmp_copy, kernel, borderType=borderPixels)
+            skel = cv2.bitwise_or(skel,im_temp)
+            tmp_copy = copy.deepcopy(im_eroded)
+            if cv2.countNonZero(tmp_copy)==0:
+                return skel

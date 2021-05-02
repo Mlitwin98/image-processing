@@ -17,7 +17,7 @@ class NewMorphWindow(Toplevel):
         self.title("Operacje morfologiczne")
         self.protocol("WM_DELETE_WINDOW", lambda: self.cancel())
 
-        self.operations = ["EROZJA", "DYLACJA", "OTWARCIE", "ZAMKNIĘCIE",]
+        self.operations = ["EROZJA", "DYLACJA", "OTWARCIE", "ZAMKNIĘCIE", "SZKIELETYZACJA"]
         self.shapes = ["KWADRAT", "ROMB"]
         self.handleBorder = {
             "Bez zmian (isolated)":0, 
