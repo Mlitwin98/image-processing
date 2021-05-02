@@ -8,7 +8,7 @@ from line_profle_window import NewLineProfileWindow
 from slider_window import NewSliderWindow
 from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
-from custom_mask_window import NewCustomMaskWindow
+from custom_mask_window import NewCustomMaskWindow, NewCustomMaskWindowConv
 from custom_stretch_window import NewCustomStretchWindow
 from morph_window import NewMorphWindow
 
@@ -129,7 +129,8 @@ class NewImageWindow(Toplevel):
         neighborOper.add_cascade(label="Detekcja krawędzi", menu=detectEdges)
         neighborOper.add_cascade(label="Wyostrzanie", menu=sharpen)
         neighborOper.add_cascade(label="Medianowe", menu=medianM)
-        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_custom_mask_window())
+        neighborOper.add_command(label="Własne", compound=LEFT, command=lambda:self.create_custom_mask_window(1))
+        neighborOper.add_command(label="Własne splot", compound=LEFT, command=lambda:self.create_custom_mask_window(0))
 
         neighborOper.add_separator()
         neighborOper.add_command(label="OPCJE SKRAJNYCH PIKSELI", state='disabled', compound=LEFT)
@@ -191,14 +192,23 @@ class NewImageWindow(Toplevel):
         wg = NewMorphWindow(self)
         wg.focus_set()
 
-    def create_custom_mask_window(self):
-        for widget in self.winfo_children():
-            if(type(widget) == NewCustomMaskWindow):
-                widget.lift()
-                widget.focus_set()
-                return
-        wg = NewCustomMaskWindow(self)
-        wg.focus_set()
+    def create_custom_mask_window(self, option):
+        if option == 1:
+            for widget in self.winfo_children():
+                if(type(widget) == NewCustomMaskWindow):
+                    widget.lift()
+                    widget.focus_set()
+                    return
+            wg = NewCustomMaskWindow(self)
+            wg.focus_set()
+        elif option == 0:
+            for widget in self.winfo_children():
+                if(type(widget) == NewCustomMaskWindowConv):
+                    widget.lift()
+                    widget.focus_set()
+                    return
+            wg = NewCustomMaskWindowConv(self)
+            wg.focus_set()
 
     def create_two_args_window(self):
         for widget in self.master.winfo_children():

@@ -1,6 +1,4 @@
 NOWE:
-2. Maska 5x5 z dwóch masek 3x3
-3. Szkieletyzacja
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
