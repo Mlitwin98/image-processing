@@ -133,7 +133,7 @@ class ImageSaved():
         self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
-    def twoArgsOperations(self, operation, imgToAdd):
+    def two_args_operations(self, operation, imgToAdd):
         img = imgToAdd.cv2Image
         img = cv2.resize(img, self.cv2Image.shape)
 
@@ -148,14 +148,14 @@ class ImageSaved():
         
         return operations[operation]()
 
-    def neighborOperations(self, operation, borderOption, customMask=None):
+    def neighbor_operations(self, operation, borderOption, customMask=None):
         outputType = cv2.CV_64F
         borderPixels = [cv2.BORDER_ISOLATED, cv2.BORDER_REFLECT, cv2.BORDER_REPLICATE][borderOption]
 
         operations = {
             "BLUR": lambda:cv2.blur(self.cv2Image, (5, 5), borderType=borderPixels),
             "GAUSSIAN": lambda:cv2.GaussianBlur(self.cv2Image, (5,5), 0, borderType=borderPixels),
-            "SOBEL": lambda:self.handleSobel(outputType, borderPixels),
+            "SOBEL": lambda:self.handle_sobel(outputType, borderPixels),
             "LAPLASJAN": lambda:self.normalize(cv2.Laplacian(self.cv2Image, outputType, ksize=3, borderType=borderPixels)),
             "CANNY": lambda:cv2.Canny(self.cv2Image, 100, 200),
             "PRW N": lambda:self.normalize(cv2.filter2D(self.cv2Image, outputType, mask_prewittN, borderType=borderPixels)),
@@ -178,7 +178,7 @@ class ImageSaved():
         self.cv2Image = operations[operation]()
         self.fill_histogram()
 
-    def handleSobel(self, dtype, borderPixels):
+    def handle_sobel(self, dtype, borderPixels):
         sobelx = cv2.Sobel(self.cv2Image,dtype, 1,0,ksize=5, borderType=borderPixels)
         sobely = cv2.Sobel(self.cv2Image,dtype, 0,1,ksize=5, borderType=borderPixels)
         scaled_x = self.normalize(sobelx)
@@ -190,7 +190,7 @@ class ImageSaved():
         scaled_input = np.uint8(255*abs_input/np.max(abs_input))
         return scaled_input
 
-    def morphOperations(self, operation, shape, size, borderOption):
+    def morph_operations(self, operation, shape, size, borderOption):
         kernel = np.ones((size, size), np.uint8) if shape=="KWADRAT" else np.uint8(np.add.outer(*[np.r_[:size//2,size//2:-1:-1]]*2)>=size//2)
         borderPixels = [cv2.BORDER_ISOLATED, cv2.BORDER_REFLECT, cv2.BORDER_REPLICATE][borderOption]
         operations = {
@@ -198,13 +198,13 @@ class ImageSaved():
             "DYLACJA": lambda: cv2.dilate(self.cv2Image, kernel, iterations=2, borderType=borderPixels),
             "OTWARCIE": lambda: cv2.morphologyEx(self.cv2Image, cv2.MORPH_OPEN, kernel, iterations=2, borderType=borderPixels),
             "ZAMKNIĘCIE": lambda: cv2.morphologyEx(self.cv2Image, cv2.MORPH_CLOSE, kernel, iterations=2, borderType=borderPixels),
-            "SZKIELETYZACJA": lambda: self.handleSkeletonize(borderPixels),
+            "SZKIELETYZACJA": lambda: self.handle_skeletonize(borderPixels),
         }
 
         self.cv2Image = operations[operation]()
         self.fill_histogram()
 
-    def handleSkeletonize(self, borderPixels):
+    def handle_skeletonize(self, borderPixels):
         skel = np.zeros(self.cv2Image.shape, np.uint8)
         kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
         tmp_copy = copy.deepcopy(self.cv2Image)
@@ -216,3 +216,6 @@ class ImageSaved():
             tmp_copy = copy.deepcopy(im_eroded)
             if cv2.countNonZero(tmp_copy)==0:
                 return skel
+
+    def my_watershed(self):
+        pass

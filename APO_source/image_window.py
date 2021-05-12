@@ -108,6 +108,7 @@ class NewImageWindow(Toplevel):
         imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=self.create_two_args_window)
         imageMan.add_cascade(label="Sąsiedztwa", menu=neighborOper)
         imageMan.add_command(label="Morfologiczne", compound=LEFT, command=self.create_morph_window)
+        imageMan.add_command(label="Watershed", compound=LEFT, command=self.handle_watershed)
         
         # Opcje OPISU
         self.dsc.add_command(label='Histogram', compound=LEFT, command=self.create_histogram_window)
@@ -271,6 +272,11 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # ONE CLICK OPERATIONS
+    def handle_watershed(self):
+        self.image.my_watershed()
+        self.update_visible_image()
+        self.update_child_windows()
+
     def equalize_image(self):
         self.image.equalize()
         self.update_visible_image()
@@ -311,7 +317,7 @@ class NewImageWindow(Toplevel):
             self.update_child_windows()
 
     def handle_neighbor_operations(self, operation, borderOption):
-        self.image.neighborOperations(operation, borderOption)
+        self.image.neighbor_operations(operation, borderOption)
         self.update_visible_image()
         self.update_child_windows()
     # -------------------

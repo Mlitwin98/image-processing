@@ -1,25 +1,8 @@
-NOWE:
-1. Segmentacja obrazu przez progowanie adaptacyjne (adaptive thresholding)
-2. Segmentacja obrazu przez progowanie metodą Otsu (Otsu thresholding)
-3. Watershed
-
-
 DO POPRAWIENIA:
-1. Co z tym bmp? ... Tak jak na wikipedii
-2. Złe rozmiary okienka, nie mieści małych obrazków??
-3. POPRAWIĆ INSTALATOR I IMPORTY (100MB!!!!) python -O -m PyInstaller -F --clean main.spec
-4. Czy ikonki potrzebne? Ewentualnie sprawdzić jak importować
-5. Usunąłem zmianę kopii z fill_histogram() CZY TO SPRAWI BŁĘDY??
-
-NA RAZIE NIE ZADANE ALE WAŻNE:
-1. Zapisywanie
-2. Cofanie
-
-DO ZROBIENIA Z OLĄ:
-1. 
-
-DO SPYTANIA:
-1. 
+1. POPRAWIĆ INSTALATOR I IMPORTY (100MB!!!!) python -O -m PyInstaller -F --clean main.spec
 
 NEXT:
-1. Parametry do Canny itp w okienku
+1. Watershed
+2. BMP
+3. Zapisywanie
+4. Cofanie

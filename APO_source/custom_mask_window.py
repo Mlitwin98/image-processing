@@ -37,7 +37,7 @@ class NewCustomMaskWindow(Toplevel):
             return
         else:
             self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-            self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
+            self.master.image.neighbor_operations("CUSTOM", self.master.border.get(), mask)
             self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
             self.master.update_visible_image()
             self.master.update_child_windows()
@@ -49,7 +49,7 @@ class NewCustomMaskWindow(Toplevel):
             return
         else:
             self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-            self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
+            self.master.image.neighbor_operations("CUSTOM", self.master.border.get(), mask)
             self.master.update_visible_image()
             self.master.update_child_windows()
 
@@ -117,7 +117,7 @@ class NewCustomMaskWindowConv(NewCustomMaskWindow):
         else:
             mask = conv2(mask1, mask2, mode='full')
             self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-            self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
+            self.master.image.neighbor_operations("CUSTOM", self.master.border.get(), mask)
             self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
             self.master.update_visible_image()
             self.master.update_child_windows()
@@ -134,7 +134,7 @@ class NewCustomMaskWindowConv(NewCustomMaskWindow):
                 for j in range(5):
                     self.outputMaskVar[i*5+j].set(mask[i,j])
             self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-            self.master.image.neighborOperations("CUSTOM", self.master.border.get(), mask)
+            self.master.image.neighbor_operations("CUSTOM", self.master.border.get(), mask)
             self.master.update_visible_image()
             self.master.update_child_windows()
 

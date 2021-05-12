@@ -52,7 +52,7 @@ class NewTwoArgsWindow(Toplevel):
                 self.imageWindow2 = obj
                 break
 
-        outputImage = self.imageWindow1.image.twoArgsOperations(self.operationChoice.get(), self.imageWindow2.image)
+        outputImage = self.imageWindow1.image.two_args_operations(self.operationChoice.get(), self.imageWindow2.image)
 
         if self.cbVal: 
             windowName = self.imageWindow1.name + " " + self.operationChoice.get() + " " + self.imageWindow2.name
