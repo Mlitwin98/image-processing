@@ -218,4 +218,26 @@ class ImageSaved():
                 return skel
 
     def my_watershed(self):
-        pass
+        if not self.isGrayScale: img_gray = cv2.cvtColor(self.cv2Image ,cv2.COLOR_BGR2GRAY)
+        else: img_gray = self.cv2Image
+
+        _,thresh = cv2.threshold(img_gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+        opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN, np.ones((3,3),np.uint8), iterations = 1)
+
+        sure_bg = cv2.dilate(opening, np.ones((3,3),np.uint8),iterations=1)
+        dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+
+        sure_fg = np.uint8(cv2.threshold(dist_transform,0.5*dist_transform.max(),255,0)[1])
+
+        unknown = cv2.subtract(sure_bg,sure_fg)
+        _, markers = cv2.connectedComponents(sure_fg)
+
+        markers = markers+1
+        markers[unknown==255] = 0
+
+        if self.isGrayScale: markers2 = cv2.watershed(cv2.merge((self.cv2Image,self.cv2Image,self.cv2Image)), markers)
+        else: markers2 = cv2.watershed(self.cv2Image, markers)
+
+        img_gray[markers2 == -1] = 255
+        self.cv2Image[markers2 == -1] = [255,0,0]
