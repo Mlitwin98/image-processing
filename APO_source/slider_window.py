@@ -5,19 +5,18 @@ from tkinter.ttk import Button, Checkbutton
 from icons_import import saveIcon, closeIcon
 
 class NewSliderWindow(Toplevel):
-    def __init__(self, name, master = None): 
+    def __init__(self, master = None): 
             super().__init__(master = master)
-            self.set_basic(name)
+            self.set_basic()
 
             self.bind('<Configure>', lambda e: self.place_buttons())
        
-    def set_basic(self, name):
+    def set_basic(self):
         self.overrideredirect(1)
         self.set_geometry()
         self.set_scale()
         self.set_checkButton()
         self.set_save_closeButtons()
-        self.title("Progowanie {}".format(name))
 
     def set_geometry(self):
         self.width = 60
@@ -74,3 +73,34 @@ class NewSliderWindow(Toplevel):
         self.master.update_child_windows()
         self.master.thresholdScaleWindow = None
         self.destroy()
+
+class NewAdaptiveSliderWindow(NewSliderWindow):
+    def set_basic(self):
+        self.overrideredirect(1)
+        self.set_geometry()
+        self.set_scale()
+        self.set_save_closeButtons()
+
+    def fix(self, n):
+        n = int(n)
+        if not n % 2:
+            self.scale.set(n+1 if n > self.past else n-1)
+            self.update_preview(int(self.var.get()))
+            self.past = self.scale.get()
+        if n%2:
+            self.update_preview(int(self.var.get()))
+
+    def set_scale(self):
+        self.var = IntVar()
+        self.scale = Scale(self, length=300, from_=3, to=255, orient=VERTICAL, command=self.fix, variable=self.var, digits=1)
+        self.update_preview(int(self.var.get()))
+        self.scale.place(relx=0, rely=0.1, relwidth=0.9, relheight=0.7)
+        self.scale.set(0)
+
+    def update_preview(self, windowSize):
+        self.master.image.threshold_adapt(windowSize)
+        self.master.update_visible_image()
+
+    def __init__(self, master = None): 
+        self.past = 3
+        super().__init__(master)

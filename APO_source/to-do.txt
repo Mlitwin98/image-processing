@@ -1,4 +1,8 @@
 NOWE:
+1. Segmentacja obrazu przez progowanie adaptacyjne (adaptive thresholding)
+2. Segmentacja obrazu przez progowanie metodą Otsu (Otsu thresholding)
+3. Watershed
+
 
 DO POPRAWIENIA:
 1. Co z tym bmp? ... Tak jak na wikipedii
@@ -15,6 +19,7 @@ DO ZROBIENIA Z OLĄ:
 1. 
 
 DO SPYTANIA:
-1. Co z funkcjami w których wklepałem na sztywno(Czy blend pyta o alfa, beta, gamma. To samo Canny) - Może być, ale lepiej okienka pytające o to
+1. 
 
 NEXT:
+1. Parametry do Canny itp w okienku

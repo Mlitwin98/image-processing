@@ -5,7 +5,7 @@ from image_saved import ImageSaved
 from histogram_window import NewHistogramWindow
 from lut_window import NewLutWindow
 from line_profle_window import NewLineProfileWindow
-from slider_window import NewSliderWindow
+from slider_window import NewSliderWindow, NewAdaptiveSliderWindow
 from posterize_window import NewPosterizeWindow
 from two_args_window import NewTwoArgsWindow
 from custom_mask_window import NewCustomMaskWindow, NewCustomMaskWindowConv
@@ -121,7 +121,9 @@ class NewImageWindow(Toplevel):
 
         # Opcje OPERACJI JEDNOARGUMENTOWYCH
         pointOper.add_command(label="Negacja", compound=LEFT, command=self.negate_image)
-        pointOper.add_command(label="Progowanie", compound=LEFT, command=self.threshold_image)
+        pointOper.add_command(label="Progowanie", compound=LEFT, command=lambda:self.threshold_image("BASIC"))
+        pointOper.add_command(label="Progowanie adaptacyjne", compound=LEFT, command=lambda:self.threshold_image("ADAPT"))
+        pointOper.add_command(label="Progowanie Otsu", compound=LEFT, command=lambda:self.threshold_image("OTSU"))
         pointOper.add_command(label="Posteryzacja", compound=LEFT, command=self.posterize_image)
 
         # Opcje OPERACJI SĄSIEDZTWA
@@ -284,9 +286,23 @@ class NewImageWindow(Toplevel):
         self.update_visible_image()
         self.update_child_windows()
 
-    def threshold_image(self):
-        if self.thresholdScaleWindow is None:
-            self.thresholdScaleWindow = NewSliderWindow(self.name, self)
+    def threshold_image(self, method):
+        if method == "BASIC":
+            if self.thresholdScaleWindow is None:
+                self.thresholdScaleWindow = NewSliderWindow(self)
+            else:
+                self.thresholdScaleWindow.cancel()
+                self.thresholdScaleWindow = NewSliderWindow(self)
+        elif method == "ADAPT":
+            if self.thresholdScaleWindow is None:
+                self.thresholdScaleWindow = NewAdaptiveSliderWindow(self)
+            else:
+                self.thresholdScaleWindow.cancel()
+                self.thresholdScaleWindow = NewAdaptiveSliderWindow(self)
+        elif method == "OTSU":
+            self.image.threshold_otsu()
+            self.update_visible_image()
+            self.update_child_windows()
 
     def posterize_image(self):
         if self.posterizeWindow is None:

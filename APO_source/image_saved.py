@@ -72,6 +72,15 @@ class ImageSaved():
         else:
             self.cv2Image = np.where(currCopy <= level, 0, 255).astype(np.uint8)
 
+    def threshold_adapt(self, window_size):
+        self.cv2Image = cv2.adaptiveThreshold(self.copy, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, window_size, 5)
+
+    def threshold_otsu(self):
+        blurred = cv2.GaussianBlur(self.cv2Image,(5,5),0)
+        _, self.cv2Image = cv2.threshold(blurred,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        self.copy = copy.deepcopy(self.cv2Image)
+        self.fill_histogram()
+
     def posterize(self, numOfBins):
         currCopy = copy.deepcopy(self.copy)
         binArray = np.arange(np.round(255/numOfBins), 255, np.round(255/numOfBins))
@@ -101,6 +110,7 @@ class ImageSaved():
                 cumulativeSum = (((cumulativeSum-minVal)*255)/(maxVal - minVal)).astype(np.uint8)
                 self.cv2Image[:,canal] = cumulativeSum[self.cv2Image[:,canal]]
 
+        self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
 
     def stretch(self, oldMin=None, oldMax=None, newMini=None, newMaxi=None):
