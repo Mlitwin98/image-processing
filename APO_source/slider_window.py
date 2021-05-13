@@ -63,6 +63,7 @@ class NewSliderWindow(Toplevel):
         self.master.image.fill_histogram()
         self.master.update_child_windows()
         self.master.thresholdScaleWindow = None
+        self.master.manager.new_state(self.master.image.cv2Image)
         self.destroy()
 
     #GO BACK TO ORIGINAL ON "CANCEL"

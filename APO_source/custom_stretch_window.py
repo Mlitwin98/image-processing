@@ -42,6 +42,7 @@ class NewCustomStretchWindow(Toplevel):
             return
         else:
             self.master.image.stretch(p1, p2, q1, q2)
+            self.master.manager.new_state(self.master.image.cv2Image)
             self.master.update_visible_image()
             self.master.update_child_windows()
             self.destroy()

@@ -1,6 +1,8 @@
 from tkinter import Canvas, IntVar, Toplevel, Menu, messagebox
 from tkinter.constants import DISABLED, LEFT, NW, NORMAL
 from PIL import Image, ImageTk
+
+from state_manager import StateManager
 from image_saved import ImageSaved
 from histogram_window import NewHistogramWindow
 from lut_window import NewLutWindow
@@ -21,6 +23,8 @@ class NewImageWindow(Toplevel):
             self.image = ImageSaved(pathToImage)
         elif image is not None:
             self.image = image
+
+        self.manager = StateManager(self.image.cv2Image)
         self.set_images()
         self.set_geometry()
         self.set_basic(master, name)
@@ -69,9 +73,23 @@ class NewImageWindow(Toplevel):
         #Zmienić resize'owanie, aktualnie nie pasuje do linii profilu
         self.bind('<Configure>', self.resize_img)
         self.bind('<Control-d>', lambda event: self.duplicate_window())
+        self.bind('<Control-z>', lambda event: self.undo())
+        self.bind('<Control-y>', lambda event: self.redo())
         self.bind("<ButtonPress-3>", self.click)
         self.bind("<B3-Motion>", self.drag)
         self.protocol("WM_DELETE_WINDOW", lambda:self.report_close_to_windows())
+
+    def undo(self):
+        self.image.cv2Image = self.manager.undo()
+        self.image.fill_histogram()
+        self.update_visible_image()
+        self.update_child_windows()
+
+    def redo(self):
+        self.image.cv2Image = self.manager.redo()
+        self.image.fill_histogram()
+        self.update_visible_image()
+        self.update_child_windows()
 
     def report_close_to_windows(self):
         NewTwoArgsWindow.images.pop(self)
@@ -274,21 +292,25 @@ class NewImageWindow(Toplevel):
     # ONE CLICK OPERATIONS
     def handle_watershed(self):
         self.image.my_watershed()
+        self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
 
     def equalize_image(self):
         self.image.equalize()
+        self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
 
     def stretch_image(self, oldMin=None, oldMax=None, newMini=None, newMaxi=None):
         self.image.stretch(oldMin, oldMax, newMini, newMaxi)
+        self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
 
     def negate_image(self):
         self.image.negate()
+        self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
 
@@ -307,17 +329,20 @@ class NewImageWindow(Toplevel):
                 self.thresholdScaleWindow = NewAdaptiveSliderWindow(self)
         elif method == "OTSU":
             self.image.threshold_otsu()
+            self.manager.new_state(self.image.cv2Image)
             self.update_visible_image()
             self.update_child_windows()
 
     def posterize_image(self):
         if self.posterizeWindow is None:
             self.posterizeWindow = NewPosterizeWindow(self.name, self)
+            self.manager.new_state(self.image.cv2Image)
             self.update_visible_image()
             self.update_child_windows()
 
     def handle_neighbor_operations(self, operation, borderOption):
         self.image.neighbor_operations(operation, borderOption)
+        self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
     # -------------------

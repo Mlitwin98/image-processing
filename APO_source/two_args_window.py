@@ -60,6 +60,7 @@ class NewTwoArgsWindow(Toplevel):
         else:
             self.imageWindow1.image.cv2Image = outputImage
             self.imageWindow1.image.fill_histogram()
+            self.imageWindow1.manager.new_state(self.imageWindow1.image.cv2Image)
             self.imageWindow1.update_visible_image()
             self.imageWindow1.update_child_windows()
         self.cancel()

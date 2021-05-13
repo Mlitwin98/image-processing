@@ -52,6 +52,7 @@ class NewPosterizeWindow(Toplevel):
         self.master.update_visible_image()
         self.master.image.fill_histogram()
         self.master.update_child_windows()
+        self.master.manager.new_state(self.master.image.cv2Image)
         self.master.posterizeWindow = None
         self.destroy()
 

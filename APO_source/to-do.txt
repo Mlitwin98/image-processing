@@ -5,4 +5,3 @@ NEXT:
 1. Watershed
 2. BMP
 3. Zapisywanie
-4. Cofanie

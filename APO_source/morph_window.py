@@ -63,6 +63,7 @@ class NewMorphWindow(Toplevel):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
         self.master.image.morph_operations(self.operationChoice.get(), self.shape.get(), int(self.size.get()), self.handleBorder[self.borderType.get()])
         self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
+        self.master.manager.new_state(self.master.image.cv2Image)
         self.master.update_visible_image()
         self.master.update_child_windows()
         self.destroy()
