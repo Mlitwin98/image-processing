@@ -1,5 +1,7 @@
-from tkinter import Canvas, IntVar, Toplevel, Menu, messagebox
+from tkinter import Canvas, IntVar, Toplevel, Menu, messagebox, filedialog
 from tkinter.constants import DISABLED, LEFT, NW, NORMAL
+import cv2
+import os
 from PIL import Image, ImageTk
 
 from state_manager import StateManager
@@ -75,6 +77,7 @@ class NewImageWindow(Toplevel):
         self.bind('<Control-d>', lambda event: self.duplicate_window())
         self.bind('<Control-z>', lambda event: self.undo())
         self.bind('<Control-y>', lambda event: self.redo())
+        self.bind('<Control-s>', lambda event: self.save())
         self.bind("<ButtonPress-3>", self.click)
         self.bind("<B3-Motion>", self.drag)
         self.protocol("WM_DELETE_WINDOW", lambda:self.report_close_to_windows())
@@ -84,6 +87,37 @@ class NewImageWindow(Toplevel):
         self.image.fill_histogram()
         self.update_visible_image()
         self.update_child_windows()
+
+    def save(self):
+        try:
+            cv2.imwrite(self.pathToImage, self.image.cv2Image)
+        except AttributeError:
+            self.save_as()
+
+    def save_as(self):
+        try:
+            ext = self.image.file_extension
+        except AttributeError:
+            ext = '.bmp'
+        finally:
+            dir = filedialog.asksaveasfilename(
+            initialfile='*'+ext,
+            defaultextension=ext, 
+            filetypes=[
+                ('JPEG', '*.jpg'), 
+                ('PNG', '*.png'), 
+                ('BMP', '*.bmp'), 
+                ('GIF', '*.gif'),
+                ]
+            )
+            self.pathToImage = dir
+            self.name = os.path.split(dir)[1]
+            self.title(self.name)
+            try:
+                cv2.imwrite(dir, self.image.cv2Image)
+            except cv2.error:
+                messagebox.showerror("Błąd", "Nieoczekiwany błąd, sprawdź czy dobrze wprowadziłeś nazwę pliku")
+
 
     def redo(self):
         self.image.cv2Image = self.manager.redo()
@@ -102,7 +136,7 @@ class NewImageWindow(Toplevel):
 
     # WINDOW
     def duplicate_window(self):
-        NewImageWindow(self.master, self.pathToImage, self.name + '(Kopia)').focus_set()
+        NewImageWindow(self.master, None, self.name + '(Kopia)', ImageSaved(None,self.image.cv2Image)).focus_set()
     
     def place_menu(self):
         topMenu = Menu(self)
@@ -129,6 +163,10 @@ class NewImageWindow(Toplevel):
         imageMan.add_command(label="Watershed", compound=LEFT, command=self.handle_watershed)
         
         # Opcje OPISU
+        self.dsc.add_command(label='Cofnij', compound=LEFT, accelerator='Ctrl+Z', command=self.undo)
+        self.dsc.add_command(label='Powtórz', compound=LEFT, accelerator='Ctrl+Y', command=self.redo)
+        self.dsc.add_command(label='Zapisz', accelerator='Ctrl+S', compound=LEFT, command=self.save)
+        self.dsc.add_command(label='Zapisz jako...', accelerator='Ctrl+Shift+S', compound=LEFT, command=self.save_as)
         self.dsc.add_command(label='Histogram', compound=LEFT, command=self.create_histogram_window)
         self.dsc.add_command(label='LUT', compound=LEFT, command=self.create_lut_window)        
         self.dsc.add_command(label='Linia profilu', compound=LEFT, state=DISABLED, command=self.create_profile_window)
@@ -187,7 +225,7 @@ class NewImageWindow(Toplevel):
         medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 7", self.border.get()))        
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
-        topMenu.add_cascade(label="Opis", menu=self.dsc)
+        topMenu.add_cascade(label="Obraz", menu=self.dsc)
         topMenu.add_cascade(label="Manipulacja histogramem", menu=histMan)
         topMenu.add_cascade(label="Operacje", menu=imageMan)
 

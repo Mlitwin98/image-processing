@@ -86,10 +86,8 @@ class NewAdaptiveSliderWindow(NewSliderWindow):
         n = int(n)
         if not n % 2:
             self.scale.set(n+1 if n > self.past else n-1)
-            self.update_preview(int(self.var.get()))
             self.past = self.scale.get()
-        if n%2:
-            self.update_preview(int(self.var.get()))
+        self.update_preview(int(self.var.get()))
 
     def set_scale(self):
         self.var = IntVar()

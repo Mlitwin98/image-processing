@@ -7,8 +7,8 @@ from filter_masks import mask_sharp1, mask_sharp2, mask_sharp3, mask_prewittNW, 
 class ImageSaved():
     def __init__(self, path=None, imageArray=None):
         if path is not None:
-            file_extension = os.path.splitext(path)[1]
-            if file_extension == '.bmp':
+            self.file_extension = os.path.splitext(path)[1]
+            if self.file_extension == '.bmp':
                 pass
                 #OGARNIJ BMP
             #else do 20:
