@@ -8,24 +8,58 @@ class ImageSaved():
     def __init__(self, path=None, imageArray=None):
         if path is not None:
             self.file_extension = os.path.splitext(path)[1]
-            if self.file_extension == '.bmp':
-                pass
-                #OGARNIJ BMP
-            #else do 20:
 
-            self.cv2Image = cv2.imread(path, 1)
-            self.isGrayScale = self.check_if_is_gray()
-            if self.isGrayScale:
-                self.cv2Image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            # Czytanie bmp...
+            if self.file_extension == '.bmp':
+                self.isGrayScale = True
+                with open(path, 'rb') as bmp:
+                    try:
+                        signature = bmp.read(2).decode('utf-8')
+                        if  signature == "BM": #Z jakiegoś powodu niektóre .bmp nie są prawdziwymi bmp
+                            bmp.seek(10, 0)
+                            offset = int.from_bytes(bmp.read(4), 'little', signed=False)
+                            bmp.seek(18, 0)
+                            bmp_w = int.from_bytes(bmp.read(4), 'little', signed=False)
+                            bmp_h = int.from_bytes(bmp.read(4), 'little', signed=False)
+                            bmp.seek(34, 0)
+                            bmp_s = int.from_bytes(bmp.read(4), 'little', signed=False)
+                            bmp_b = int(bmp_s/bmp_h)
+
+                            bmp.seek(offset, 0)
+                            bmp_list = []
+                            for _ in range(bmp_h):
+                                for _ in range(bmp_b):
+                                    bmp_byte = bmp.read(1)
+                                    bmp_list.append((int.from_bytes(bmp_byte, 'little', signed=False)))
+
+                            bmp_list.reverse()
+                            reshaped = np.reshape(bmp_list, (bmp_h,bmp_w))
+                            for i in range(len(reshaped)):
+                                reshaped[i] = reshaped[i][::-1]
+
+                            self.cv2Image = reshaped
+
+                        else:
+                            self.handle_not_bmp(path)
+                    except UnicodeDecodeError:
+                        self.handle_not_bmp(path)  
             else:
-                self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
-                self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
+                self.handle_not_bmp(path)
         else:
             self.cv2Image = imageArray
             self.isGrayScale = self.check_if_is_gray()
             
         self.copy = copy.deepcopy(self.cv2Image)
         self.fill_histogram()
+
+    def handle_not_bmp(self, path):
+        self.cv2Image = cv2.imread(path, 1)
+        self.isGrayScale = self.check_if_is_gray()
+        if self.isGrayScale:
+            self.cv2Image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+        else:
+            self.cv2Image = cv2.imread(path, cv2.IMREAD_COLOR)
+            self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_BGR2RGB)  # WAŻNE, BO CV2 DOMYŚLNIE ZAPISUJE W KOLEJNOŚĆ B, G, R
 
     def check_if_is_gray(self):
         if len(self.cv2Image.shape) < 3: return True
