@@ -14,8 +14,6 @@ top_menu = Menu()
 file = Menu(top_menu, tearoff=False)
 file.add_command(label='Nowy', compound=LEFT, accelerator='Ctrl+N')
 file.add_command(label='Otwórz z...', compound=LEFT, accelerator='Ctrl+O', command= lambda: import_image(root))
-file.add_command(label='Zapisz', compound=LEFT, accelerator='Ctrl+S')
-file.add_command(label='Zapisz jako...', compound=LEFT, accelerator='Ctrl+Alt+S')
 
 next = Menu(top_menu, tearoff=False)
 

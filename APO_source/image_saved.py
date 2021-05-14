@@ -16,14 +16,20 @@ class ImageSaved():
                     try:
                         signature = bmp.read(2).decode('utf-8')
                         if  signature == "BM": #Z jakiegoś powodu niektóre .bmp nie są prawdziwymi bmp
-                            bmp.seek(10, 0)
+                            bmp.seek(10)
                             offset = int.from_bytes(bmp.read(4), 'little', signed=False)
-                            bmp.seek(18, 0)
-                            bmp_w = int.from_bytes(bmp.read(4), 'little', signed=False)
-                            bmp_h = int.from_bytes(bmp.read(4), 'little', signed=False)
+
+                            bmp.seek(18)
+                            bmp_w = int.from_bytes(bmp.read(4), 'little', signed=True)
+                            bmp_h = int.from_bytes(bmp.read(4), 'little', signed=True)
+
                             bmp.seek(34, 0)
                             bmp_s = int.from_bytes(bmp.read(4), 'little', signed=False)
-                            bmp_b = int(bmp_s/bmp_h)
+                            if bmp_s == 0:
+                                bmp_b = bmp_w
+                                
+                            else:
+                                bmp_b = int(bmp_s/bmp_h)
 
                             bmp.seek(offset, 0)
                             bmp_list = []
@@ -37,7 +43,7 @@ class ImageSaved():
                             for i in range(len(reshaped)):
                                 reshaped[i] = reshaped[i][::-1]
 
-                            self.cv2Image = reshaped
+                            self.cv2Image = np.uint8(reshaped)
 
                         else:
                             self.handle_not_bmp(path)
@@ -252,15 +258,17 @@ class ImageSaved():
                 return skel
 
     def my_watershed(self):
-        if not self.isGrayScale: img_gray = cv2.cvtColor(self.cv2Image ,cv2.COLOR_BGR2GRAY)
-        else: img_gray = self.cv2Image
+        if not self.isGrayScale: 
+            self.cv2Image = cv2.cvtColor(self.cv2Image ,cv2.COLOR_BGR2GRAY)
+        else:
+            self.negate()
 
-        _,thresh = cv2.threshold(img_gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        _,self.cv2Image = cv2.threshold(self.cv2Image,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
-        opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN, np.ones((3,3),np.uint8), iterations = 1)
+        self.cv2Image = cv2.morphologyEx(self.cv2Image,cv2.MORPH_OPEN, np.ones((3,3),np.uint8), iterations = 1)
 
-        sure_bg = cv2.dilate(opening, np.ones((3,3),np.uint8),iterations=1)
-        dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+        sure_bg = cv2.dilate(self.cv2Image, np.ones((3,3),np.uint8),iterations=1)
+        dist_transform = cv2.distanceTransform(self.cv2Image,cv2.DIST_L2,5)
 
         sure_fg = np.uint8(cv2.threshold(dist_transform,0.5*dist_transform.max(),255,0)[1])
 
@@ -270,8 +278,11 @@ class ImageSaved():
         markers = markers+1
         markers[unknown==255] = 0
 
-        if self.isGrayScale: markers2 = cv2.watershed(cv2.merge((self.cv2Image,self.cv2Image,self.cv2Image)), markers)
-        else: markers2 = cv2.watershed(self.cv2Image, markers)
+        if len(self.cv2Image.shape) == 2: 
+            markers2 = cv2.watershed(cv2.merge((self.cv2Image,self.cv2Image,self.cv2Image)), markers)
+        else:
+            markers2 = cv2.watershed(self.cv2Image, markers)
 
-        img_gray[markers2 == -1] = 255
-        self.cv2Image[markers2 == -1] = [255,0,0]
+        self.cv2Image[markers2 == -1] = 0
+        #self.cv2Image = cv2.subtract(thresh, img_gray)
+        #self.cv2Image[markers2 == -1] = 0

@@ -1,3 +1,4 @@
+import copy
 from tkinter import IntVar, Label, StringVar, Toplevel
 from tkinter.ttk import Button, Checkbutton, OptionMenu
 from image_saved import ImageSaved
@@ -59,6 +60,7 @@ class NewTwoArgsWindow(Toplevel):
             self.imageWindow1.create_another(self.master, None, windowName, ImageSaved(None,outputImage))
         else:
             self.imageWindow1.image.cv2Image = outputImage
+            self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
             self.imageWindow1.image.fill_histogram()
             self.imageWindow1.manager.new_state(self.imageWindow1.image.cv2Image)
             self.imageWindow1.update_visible_image()
