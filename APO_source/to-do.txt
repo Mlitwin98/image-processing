@@ -1,5 +1,2 @@
 DO POPRAWIENIA:
 1. POPRAWIĆ INSTALATOR I IMPORTY (100MB!!!!) python -O -m PyInstaller -F --clean main.spec
-
-NEXT:
-1. Watershed

@@ -1,7 +1,21 @@
-from tkinter import Tk, Canvas, Menu, mainloop, ttk
+from tkinter import Tk, Canvas, Menu, mainloop, messagebox, ttk
 root = Tk()
 from tkinter.constants import LEFT
 from files_options import import_image
+
+info = """
+Aplikacja zbiorcza z ćwiczeń laboratoryjnych i projektu
+
+Tytuł projektu: Udoskonalenie oprogramowania przygotowanego na zajęciach przez wykonanie narzędzia do ekstrakcja linii pionowych i poziomych za pomocą operacji morfologicznych 
+
+Autor: Mateusz Litwin
+
+Prowadzący: mgr inż. Łukasz Roszkowiak
+
+Algorytmy Przetwarzania Obrazów 2021
+
+WIT grupa ID: ID06IO1
+"""
 
 root.title("APO")
 style = ttk.Style(root)
@@ -18,6 +32,7 @@ file.add_command(label='Otwórz z...', compound=LEFT, accelerator='Ctrl+O', comm
 next = Menu(top_menu, tearoff=False)
 
 top_menu.add_cascade(label='Plik', menu=file)
+top_menu.add_command(label="Informacja o programie", command= lambda: messagebox.showinfo("Informacje", info))
 
 
 root.bind_all("<Control-o>", func= lambda x:import_image(root))

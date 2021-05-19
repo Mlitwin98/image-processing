@@ -15,6 +15,7 @@ from two_args_window import NewTwoArgsWindow
 from custom_mask_window import NewCustomMaskWindow, NewCustomMaskWindowConv
 from custom_stretch_window import NewCustomStretchWindow
 from morph_window import NewMorphWindow
+from morph_line_window import NewMorphLineWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -153,13 +154,12 @@ class NewImageWindow(Toplevel):
         sharpen = Menu(neighborOper, tearoff=False)
         medianM = Menu(neighborOper, tearoff=False)
 
-        morphOper = Menu(imageMan, tearoff=False)
-
 
         imageMan.add_cascade(label="Jednoargumentowe", menu=pointOper)
         imageMan.add_command(label="Dwuargumentowe", compound=LEFT, command=self.create_two_args_window)
         imageMan.add_cascade(label="Sąsiedztwa", menu=neighborOper)
         imageMan.add_command(label="Morfologiczne", compound=LEFT, command=self.create_morph_window)
+        imageMan.add_command(label="Morfologiczna ekstrakcja linii", compound=LEFT, command=self.create_morph_line_window)
         imageMan.add_command(label="Watershed", compound=LEFT, command=self.handle_watershed)
         
         # Opcje OPISU
@@ -249,6 +249,18 @@ class NewImageWindow(Toplevel):
                 widget.focus_set()
                 return
         wg = NewMorphWindow(self)
+        wg.focus_set()
+
+    def create_morph_line_window(self):
+        if not self.image.check_if_binary():
+            messagebox.showerror("Błąd", "Obraz musi być binarny. Wykonaj posteryzację dla 2 i spróbuj ponownie.")
+            return
+        for widget in self.winfo_children():
+            if(type(widget) == NewMorphLineWindow):
+                widget.lift()
+                widget.focus_set()
+                return
+        wg = NewMorphLineWindow(self)
         wg.focus_set()
 
     def create_custom_mask_window(self, option):
