@@ -286,3 +286,21 @@ class ImageSaved():
         self.cv2Image[markers2 == -1] = 0
         #self.cv2Image = cv2.subtract(thresh, img_gray)
         #self.cv2Image[markers2 == -1] = 0
+
+    def morph_line(self, horizontalW, horizontalH, veritcalW, verticalH,searchHorizontal, searchVertical, borderOption):
+        horizontal = np.zeros_like(self.cv2Image)
+        vertical = np.zeros_like(self.cv2Image)
+
+        if searchHorizontal:
+            horizontal = np.copy(self.cv2Image)
+            horizontalElement = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalW, horizontalH))
+            horizontal = cv2.erode(horizontal, horizontalElement, borderType=borderOption)
+            horizontal = cv2.dilate(horizontal, horizontalElement, borderType=borderOption)
+
+        if searchVertical:
+            vertical = np.copy(self.cv2Image)
+            verticalElement = cv2.getStructuringElement(cv2.MORPH_RECT, (verticalH, veritcalW))
+            vertical = cv2.erode(vertical, verticalElement, borderType=borderOption)
+            vertical = cv2.dilate(vertical, verticalElement, borderType=borderOption)
+
+        self.cv2Image = cv2.add(horizontal, vertical)
