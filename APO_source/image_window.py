@@ -241,7 +241,7 @@ class NewImageWindow(Toplevel):
     # SET CHILD WINDOWS
     def create_morph_window(self):
         if not self.image.check_if_binary():
-            messagebox.showerror("Błąd", "Obraz musi być binarny. Wykonaj posteryzację dla 2 i spróbuj ponownie.")
+            messagebox.showerror("Błąd", "Obraz musi być binarny. Wykonaj posteryzację dla wartości 2 i spróbuj ponownie.")
             return
         for widget in self.winfo_children():
             if(type(widget) == NewMorphWindow):
@@ -252,9 +252,6 @@ class NewImageWindow(Toplevel):
         wg.focus_set()
 
     def create_morph_line_window(self):
-        if not self.image.check_if_binary():
-            messagebox.showerror("Błąd", "Obraz musi być binarny. Wykonaj posteryzację dla 2 i spróbuj ponownie.")
-            return
         for widget in self.winfo_children():
             if(type(widget) == NewMorphLineWindow):
                 widget.lift()

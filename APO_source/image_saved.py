@@ -25,23 +25,34 @@ class ImageSaved():
 
                             bmp.seek(34, 0)
                             bmp_s = int.from_bytes(bmp.read(4), 'little', signed=False)
+
+                            bmp.seek(28)
+                            bpp = int.from_bytes(bmp.read(2), 'little', signed=False)
+
+                            jumpVal = 1
+                            if bpp == 24:
+                                jumpVal = 3
+
+
                             if bmp_s == 0:
                                 bmp_b = bmp_w
-                                
                             else:
                                 bmp_b = int(bmp_s/bmp_h)
 
+
                             bmp.seek(offset, 0)
-                            bmp_list = []
+                            bmp_line = []
+                            bmp_whole = []
                             for _ in range(bmp_h):
                                 for _ in range(bmp_b):
                                     bmp_byte = bmp.read(1)
-                                    bmp_list.append((int.from_bytes(bmp_byte, 'little', signed=False)))
+                                    bmp_line.append((int.from_bytes(bmp_byte, 'little', signed=False)))
+                                bmp_whole.append(bmp_line[::jumpVal])
+                                bmp_line = []
 
-                            bmp_list.reverse()
-                            reshaped = np.reshape(bmp_list, (bmp_h,bmp_w))
-                            for i in range(len(reshaped)):
-                                reshaped[i] = reshaped[i][::-1]
+                            bmp_whole.reverse()
+                            reshaped = np.reshape(bmp_whole, (bmp_h,bmp_w))
+
 
                             self.cv2Image = np.uint8(reshaped)
 
@@ -291,16 +302,18 @@ class ImageSaved():
         horizontal = np.zeros_like(self.cv2Image)
         vertical = np.zeros_like(self.cv2Image)
 
+        self.cv2Image = cv2.adaptiveThreshold(self.cv2Image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, -2)
+
         if searchHorizontal:
-            horizontal = np.copy(self.cv2Image)
-            horizontalElement = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalW, horizontalH))
-            horizontal = cv2.erode(horizontal, horizontalElement, borderType=borderOption)
-            horizontal = cv2.dilate(horizontal, horizontalElement, borderType=borderOption)
+            horizontal = self.handle_line_extraction(horizontalW, horizontalH, borderOption)
 
         if searchVertical:
-            vertical = np.copy(self.cv2Image)
-            verticalElement = cv2.getStructuringElement(cv2.MORPH_RECT, (verticalH, veritcalW))
-            vertical = cv2.erode(vertical, verticalElement, borderType=borderOption)
-            vertical = cv2.dilate(vertical, verticalElement, borderType=borderOption)
+            vertical = self.handle_line_extraction(verticalH, veritcalW, borderOption)
 
         self.cv2Image = cv2.add(horizontal, vertical)
+
+    def handle_line_extraction(self, width, height, borderOption):
+        output = np.copy(self.cv2Image)
+        outputElement = cv2.getStructuringElement(cv2.MORPH_RECT, (width, height))
+        output = cv2.erode(output, outputElement, borderType=borderOption)
+        return cv2.dilate(output, outputElement, borderType=borderOption)
