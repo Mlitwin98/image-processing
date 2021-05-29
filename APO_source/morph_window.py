@@ -1,5 +1,5 @@
 import copy
-from tkinter import StringVar, Toplevel ,Spinbox
+from tkinter import Label, StringVar, Toplevel ,Spinbox
 from tkinter.ttk import Button, OptionMenu
 
 from icons_import import saveIcon, closeIcon
@@ -12,8 +12,8 @@ class NewMorphWindow(Toplevel):
 
         
     def set_basic(self):
-        self.minsize(300, 300)
-        self.maxsize(300, 300)
+        self.minsize(500, 300)
+        self.maxsize(500, 300)
         self.title("Operacje morfologiczne")
         self.protocol("WM_DELETE_WINDOW", lambda: self.cancel())
 
@@ -75,14 +75,17 @@ class NewMorphWindow(Toplevel):
         self.master.update_child_windows()
 
     def place_widgets(self):
-        self.operationList.place(width=250, height=50, x=25, y=20)
-        self.shapeList.place(width=100, height=50, x=25, y=80)
-        self.sizeSpin.place(width=100, height=50, x=175, y=80)
-        self.borderList.place(width=250, height=50, x=25, y=140)
+        Label(self, text="Operacja:", font=("Helvetica", 15)).place(x=25, y=25)
+        Label(self, text="Kształt i rozmiar:", font=("Helvetica", 15)).place(x=25, y=85)
+        Label(self, text="Piksele skrajne:", font=("Helvetica", 15)).place(x=25, y=145)
+        self.operationList.place(width=250, height=50, x=225, y=20)
+        self.shapeList.place(width=100, height=50, x=225, y=80)
+        self.sizeSpin.place(width=100, height=50, x=375, y=80)
+        self.borderList.place(width=250, height=50, x=225, y=140)
 
 
-        self.saveButton.place(width=40, height=40, x=70, y=255)
-        self.cancelButton.place(width=40, height=40, x=190, y=255)
+        self.saveButton.place(width=40, height=40, x=200, y=255)
+        self.cancelButton.place(width=40, height=40, x=260, y=255)
 
     def cancel(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)

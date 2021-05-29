@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import copy
+import random
 import os
 from filter_masks import mask_sharp1, mask_sharp2, mask_sharp3, mask_prewittNW, mask_prewittN, mask_prewittE, mask_prewittNE, mask_prewittS, mask_prewittSE, mask_prewittSW, mask_prewittW
 
@@ -87,7 +88,6 @@ class ImageSaved():
 
     def check_if_binary(self):
         if not self.isGrayScale:
-            print("Not gray")
             return False
         else:
             white_pix = np.sum(self.cv2Image == 255)
@@ -95,7 +95,7 @@ class ImageSaved():
             return self.cv2Image.shape[0]*self.cv2Image.shape[1] == white_pix+black_pix
 
     def fill_histogram(self):
-        if self.isGrayScale:
+        if self.check_if_is_gray():
             self.lut = np.zeros(shape=256).astype(int)
             h, w = self.cv2Image.shape
             for i in range(h):
@@ -317,3 +317,31 @@ class ImageSaved():
         outputElement = cv2.getStructuringElement(cv2.MORPH_RECT, (width, height))
         output = cv2.erode(output, outputElement, borderType=borderOption)
         return cv2.dilate(output, outputElement, borderType=borderOption)
+
+    def get_objects_vector(self):
+        self.cv2Image = self.copy
+        if not self.check_if_is_gray(): 
+            self.cv2Image = cv2.cvtColor(self.cv2Image ,cv2.COLOR_BGR2GRAY)
+        outerPoints = np.array([[[0,0]], [[0, self.cv2Image.shape[0]-1]], [[self.cv2Image.shape[1]-1, self.cv2Image.shape[0]-1]], [[self.cv2Image.shape[1]-1, 0]]])
+
+        _,thresh = cv2.threshold(self.cv2Image,127,255,0)
+        contours,hierarchy = cv2.findContours(thresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_GRAY2RGB)
+
+        colours = []
+        moments = []
+        areas = []
+        lengths = []
+        for cnt in contours:
+            if np.any(np.isin(outerPoints, cnt)):
+                continue
+            colour = random.randrange(50,250,25),random.randrange(50,250,25),random.randrange(50,250,25)
+            cv2.drawContours(self.cv2Image, [cnt], 0, colour, 3)
+
+            colours.append(colour)
+            moments.append(cv2.moments(cnt))
+            areas.append(cv2.contourArea(cnt))
+            lengths.append(cv2.arcLength(cnt,True))
+
+        return colours, moments, areas, lengths
+

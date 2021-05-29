@@ -16,6 +16,7 @@ from custom_mask_window import NewCustomMaskWindow, NewCustomMaskWindowConv
 from custom_stretch_window import NewCustomStretchWindow
 from morph_window import NewMorphWindow
 from morph_line_window import NewMorphLineWindow
+from moments_window import NewMomentsWindow
 
 class NewImageWindow(Toplevel):
     def __init__(self, master = None, pathToImage = None, name=None, image=None): 
@@ -85,6 +86,7 @@ class NewImageWindow(Toplevel):
 
     def undo(self):
         self.image.cv2Image = self.manager.undo()
+        self.image.copy = self.image.cv2Image
         self.image.fill_histogram()
         self.update_visible_image()
         self.update_child_windows()
@@ -122,6 +124,7 @@ class NewImageWindow(Toplevel):
 
     def redo(self):
         self.image.cv2Image = self.manager.redo()
+        self.image.copy = self.image.cv2Image
         self.image.fill_histogram()
         self.update_visible_image()
         self.update_child_windows()
@@ -145,6 +148,7 @@ class NewImageWindow(Toplevel):
         histMan = Menu(topMenu, tearoff=False)
         
         imageMan = Menu(topMenu, tearoff=False)
+        imageAnalize = Menu(topMenu, tearoff=False)
         pointOper = Menu(imageMan, tearoff=False)
 
         neighborOper = Menu(imageMan, tearoff=False)
@@ -224,10 +228,15 @@ class NewImageWindow(Toplevel):
         medianM.add_command(label="Maska 5x5", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 5", self.border.get()))
         medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 7", self.border.get()))        
 
+        # OPECJE ANALIZY
+        imageAnalize.add_command(label="Wyznaczenie wektor cech obiektów", compound=LEFT, command=self.handle_objects_vector)
+        imageAnalize.add_command(label="Klasyfikacja obiektów", compound=LEFT, command=2+2)
+
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Obraz", menu=self.dsc)
         topMenu.add_cascade(label="Manipulacja histogramem", menu=histMan)
         topMenu.add_cascade(label="Operacje", menu=imageMan)
+        topMenu.add_cascade(label="Analiza", menu=imageAnalize)
 
         self.config(menu = topMenu)
     
@@ -239,6 +248,15 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
+    def create_moments_window(self, colours, moments, areas, lengths):
+        for widget in self.winfo_children():
+            if(type(widget) == NewMomentsWindow):
+                widget.lift()
+                widget.focus_set()
+                return
+        wg = NewMomentsWindow(self, colours, moments, areas, lengths)
+        wg.focus_set()
+
     def create_morph_window(self):
         if not self.image.check_if_binary():
             messagebox.showerror("Błąd", "Obraz musi być binarny. Wykonaj posteryzację dla wartości 2 i spróbuj ponownie.")
@@ -337,8 +355,16 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # ONE CLICK OPERATIONS
+    def handle_objects_vector(self):
+        colours, moments, areas, lengths = self.image.get_objects_vector()
+        self.manager.new_state(self.image.cv2Image)
+        self.update_visible_image()
+        self.update_child_windows()
+        self.create_moments_window(colours, moments, areas, lengths)
+
     def handle_watershed(self):
         self.image.my_watershed()
+        self.image.copy = self.image.cv2Image
         self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
