@@ -230,7 +230,7 @@ class NewImageWindow(Toplevel):
 
         # OPECJE ANALIZY
         imageAnalize.add_command(label="Wyznaczenie wektor cech obiektów", compound=LEFT, command=self.handle_objects_vector)
-        imageAnalize.add_command(label="Klasyfikacja obiektów", compound=LEFT, command=2+2)
+        imageAnalize.add_command(label="Klasyfikacja obiektów fasoli, ryżu i grochu", compound=LEFT, command=self.handle_classify)
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
         topMenu.add_cascade(label="Obraz", menu=self.dsc)
@@ -355,6 +355,13 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # ONE CLICK OPERATIONS
+    def handle_classify(self):
+        self.image.classify()
+        self.manager.new_state(self.image.cv2Image)
+        self.update_visible_image()
+        self.update_child_windows()
+        messagebox.showinfo("LEGENDA", "Zielony = ryz \n Niebieski = soczewica \n Czerwony = fasola")
+
     def handle_objects_vector(self):
         colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters = self.image.get_objects_vector()
         self.manager.new_state(self.image.cv2Image)

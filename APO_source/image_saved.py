@@ -325,7 +325,7 @@ class ImageSaved():
         outerPoints = np.array([[[0,0]], [[0, self.cv2Image.shape[0]-1]], [[self.cv2Image.shape[1]-1, self.cv2Image.shape[0]-1]], [[self.cv2Image.shape[1]-1, 0]]])
 
         _,thresh = cv2.threshold(self.cv2Image,127,255,0)
-        contours,hierarchy = cv2.findContours(thresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        contours,hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         self.cv2Image = cv2.cvtColor(self.cv2Image, cv2.COLOR_GRAY2RGB)
 
         colours = []
@@ -364,3 +364,103 @@ class ImageSaved():
 
         return colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters
 
+    def get_objects_vector_img(self, image):
+        outerPoints = np.array([[[0,0]], [[0, image.shape[0]-1]], [[image.shape[1]-1, image.shape[0]-1]], [[image.shape[1]-1, 0]]])
+        _,thresh = cv2.threshold(image,127,255,0)
+        contours,hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+        moments = []
+        areas = []
+        lengths = []
+        aspectRatios = []
+        extents = []
+        solidities = []
+        equivalentDiameters = []
+        for cnt in contours:
+            if len(cnt) == 4 and np.any(np.isin(outerPoints, cnt)):
+                continue
+
+            area = cv2.contourArea(cnt)
+            _,_,w,h = cv2.boundingRect(cnt)
+            rect_area = w*h
+            hull = cv2.convexHull(cnt)
+            hull_area = cv2.contourArea(hull)
+            
+            aspect_ratio = float(w)/h if h != 0 else 0
+            extent = float(area)/rect_area if rect_area != 0 else 0
+            solidity = float(area)/hull_area if hull_area != 0 else 0
+            equi_diameter = np.sqrt(4*area/np.pi)
+
+            moments.append(cv2.moments(cnt))
+            areas.append(area)
+            lengths.append(cv2.arcLength(cnt,True))
+            aspectRatios.append(aspect_ratio)
+            extents.append(extent)
+            solidities.append(solidity)
+            equivalentDiameters.append(equi_diameter)
+
+        return moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters
+
+    def classify(self):
+        outerPoints = np.array([[[0,0]], [[0, self.cv2Image.shape[0]-1]], [[self.cv2Image.shape[1]-1, self.cv2Image.shape[0]-1]], [[self.cv2Image.shape[1]-1, 0]]])
+        img1 = cv2.imread('train_imgs/train_ryz.jpg', cv2.IMREAD_GRAYSCALE)
+        img2 = cv2.imread('train_imgs/train_soczewica.jpg', cv2.IMREAD_GRAYSCALE)
+        img3 = cv2.imread('train_imgs/train_fasola.jpg', cv2.IMREAD_GRAYSCALE)
+        feat1 = self.get_feat(self.get_objects_vector_img(img1))
+        feat2 = self.get_feat(self.get_objects_vector_img(img2))
+        feat3 = self.get_feat(self.get_objects_vector_img(img3))
+
+        x_input = np.float32(np.concatenate((feat1,np.concatenate((feat2, feat3),axis =1)),axis =1).transpose())
+        print(x_input.shape)
+        t1 = self.get_target(feat1, 1)
+        t2 = self.get_target(feat2, 2)
+        t3 = self.get_target(feat3, 3)
+        t_input = np.int64(np.concatenate((t1,np.concatenate((t2, t3)))))
+
+        mysvm = cv2.ml.SVM_create()
+        mysvm.setType(cv2.ml.SVM_C_SVC)
+        mysvm.setKernel(cv2.ml.SVM_LINEAR)
+        mysvm.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER, 10000, 1e-6))
+        mysvm.train(x_input, cv2.ml.ROW_SAMPLE, t_input)
+
+        if not self.check_if_is_gray(): 
+            self.cv2Image = cv2.cvtColor(self.cv2Image ,cv2.COLOR_BGR2GRAY)
+        feat_test = self.get_feat(self.get_objects_vector_img(self.cv2Image))
+        _,thresh = cv2.threshold(self.cv2Image,127,255,0)
+        contours,hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE) 
+
+        self.cv2Image = cv2.cvtColor(self.cv2Image,cv2.COLOR_GRAY2RGB)
+        for x, cnt in enumerate(contours):
+            if len(cnt) == 4 and np.any(np.isin(outerPoints, cnt)):
+                continue
+            sampleMat = np.float32(feat_test[:,x].reshape(-1,1).transpose())
+            response = mysvm.predict(sampleMat)[1]
+            print(response)
+            if response == 1:
+                cv2.drawContours(self.cv2Image, [cnt], 0, (0,255,0), 3) # zielony = ryz
+            elif response == 2:
+                cv2.drawContours(self.cv2Image, [cnt], 0, (255,0,0), 3) # niebieski = soczewica
+            elif response == 3:
+                cv2.drawContours(self.cv2Image, [cnt], 0, (0,0,255), 3) # czerwony = fasola
+            else:
+                cv2.drawContours(self.cv2Image, [cnt], 0, (255,255,255), 3)
+
+
+    def get_feat(self, vector):
+        M, area, perimeter, aspect_ratio, extent, solidities, equi_diameter = vector
+        
+        M_vec = np.array([np.array(list(m.values())) for m in M])
+        M_vec.reshape(-1,1)
+        M_vec = np.hstack((M_vec, np.array(area).reshape(-1,1)))
+        M_vec = np.hstack((M_vec, np.array(perimeter).reshape(-1,1)))
+        M_vec = np.hstack((M_vec, np.array(aspect_ratio).reshape(-1,1)))
+        M_vec = np.hstack((M_vec, np.array(extent).reshape(-1,1)))
+        M_vec = np.hstack((M_vec, np.array(solidities).reshape(-1,1)))
+        M_vec = np.hstack((M_vec, np.array(equi_diameter).reshape(-1,1))).transpose()
+
+        return M_vec
+
+    def get_target(self,input_feats, target_class = 1):
+        sh = input_feats.shape
+        out = np.ones((sh[1],1))
+        return out*target_class
