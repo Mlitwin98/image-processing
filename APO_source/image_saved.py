@@ -332,16 +332,35 @@ class ImageSaved():
         moments = []
         areas = []
         lengths = []
+        aspectRatios = []
+        extents = []
+        solidities = []
+        equivalentDiameters = []
         for cnt in contours:
-            if np.any(np.isin(outerPoints, cnt)):
+            if len(cnt) == 4 and np.any(np.isin(outerPoints, cnt)):
                 continue
             colour = random.randrange(50,250,25),random.randrange(50,250,25),random.randrange(50,250,25)
             cv2.drawContours(self.cv2Image, [cnt], 0, colour, 3)
 
+            area = cv2.contourArea(cnt)
+            _,_,w,h = cv2.boundingRect(cnt)
+            rect_area = w*h
+            hull = cv2.convexHull(cnt)
+            hull_area = cv2.contourArea(hull)
+            
+            aspect_ratio = float(w)/h if h != 0 else 0
+            extent = float(area)/rect_area if rect_area != 0 else 0
+            solidity = float(area)/hull_area if hull_area != 0 else 0
+            equi_diameter = np.sqrt(4*area/np.pi)
+
             colours.append(colour)
             moments.append(cv2.moments(cnt))
-            areas.append(cv2.contourArea(cnt))
+            areas.append(area)
             lengths.append(cv2.arcLength(cnt,True))
+            aspectRatios.append(aspect_ratio)
+            extents.append(extent)
+            solidities.append(solidity)
+            equivalentDiameters.append(equi_diameter)
 
-        return colours, moments, areas, lengths
+        return colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters
 

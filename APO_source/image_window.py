@@ -248,13 +248,13 @@ class NewImageWindow(Toplevel):
     # -------------------
 
     # SET CHILD WINDOWS
-    def create_moments_window(self, colours, moments, areas, lengths):
+    def create_moments_window(self, colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters):
         for widget in self.winfo_children():
             if(type(widget) == NewMomentsWindow):
                 widget.lift()
                 widget.focus_set()
                 return
-        wg = NewMomentsWindow(self, colours, moments, areas, lengths)
+        wg = NewMomentsWindow(self, colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters)
         wg.focus_set()
 
     def create_morph_window(self):
@@ -356,11 +356,11 @@ class NewImageWindow(Toplevel):
 
     # ONE CLICK OPERATIONS
     def handle_objects_vector(self):
-        colours, moments, areas, lengths = self.image.get_objects_vector()
+        colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters = self.image.get_objects_vector()
         self.manager.new_state(self.image.cv2Image)
         self.update_visible_image()
         self.update_child_windows()
-        self.create_moments_window(colours, moments, areas, lengths)
+        self.create_moments_window(colours, moments, areas, lengths, aspectRatios, extents, solidities, equivalentDiameters)
 
     def handle_watershed(self):
         self.image.my_watershed()
