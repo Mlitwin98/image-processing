@@ -229,7 +229,7 @@ class NewImageWindow(Toplevel):
         medianM.add_command(label="Maska 7x7", compound=LEFT, command=lambda:self.handle_neighbor_operations("MEDIAN 7", self.border.get()))        
 
         # OPECJE ANALIZY
-        imageAnalize.add_command(label="Wyznaczenie wektor cech obiektów", compound=LEFT, command=self.handle_objects_vector)
+        imageAnalize.add_command(label="Wyznaczenie wektora cech obiektów", compound=LEFT, command=self.handle_objects_vector)
         imageAnalize.add_command(label="Klasyfikacja obiektów fasoli, ryżu i grochu", compound=LEFT, command=self.handle_classify)
 
         # DODANIE GŁÓWNYCH ZAKŁADEK
