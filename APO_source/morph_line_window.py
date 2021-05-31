@@ -12,8 +12,8 @@ class NewMorphLineWindow(Toplevel):
 
         
     def set_basic(self):
-        self.minsize(600, 300)
-        self.maxsize(600, 300)
+        self.minsize(600, 350)
+        self.maxsize(600, 350)
         self.title("Ekstrakcja linii")
         self.protocol("WM_DELETE_WINDOW", lambda: self.cancel())
 
@@ -31,6 +31,13 @@ class NewMorphLineWindow(Toplevel):
         self.borderType = StringVar(self, list(self.handleBorder.keys())[0])
         self.cbVarHorizontal = IntVar(value=1)
         self.cbVarVertical = IntVar(value=1)
+        self.cbVarOuter = IntVar(value=1)
+        self.cbVarNegate = IntVar(value=0)
+
+        self.sizeHorizontalWSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.horizontalSizeW, command=self.update_preview, state='readonly', increment=2)
+        self.sizeHorizontalHSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.horizontalSizeH, command=self.update_preview, state='readonly', increment=2)
+        self.sizeVerticalWSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.verticalSizeW, command=self.update_preview, state='readonly', increment=2)
+        self.sizeVerticalHSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.verticalSizeH, command=self.update_preview, state='readonly', increment=2)
 
         self.horizontalSizeW.trace("w", self.update_preview)
         self.horizontalSizeH.trace("w", self.update_preview)
@@ -39,15 +46,11 @@ class NewMorphLineWindow(Toplevel):
         self.borderType.trace("w", self.update_preview)
         self.cbVarHorizontal.trace("w", self.update_preview)
         self.cbVarVertical.trace("w", self.update_preview)
-
-        
-        self.sizeHorizontalWSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.horizontalSizeW, command=self.update_preview, state='readonly', increment=2)
-        self.sizeHorizontalHSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.horizontalSizeH, command=self.update_preview, state='readonly', increment=2)
-        self.sizeVerticalWSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.verticalSizeW, command=self.update_preview, state='readonly', increment=2)
-        self.sizeVerticalHSpin = Spinbox(self, justify='center', font=("Helvetica", 15), from_=1, to=9999, textvariable=self.verticalSizeH, command=self.update_preview, state='readonly', increment=2)
+        self.cbVarOuter.trace("w", self.update_preview)
         
         self.cbHorizontal = Checkbutton(self, width=0, variable=self.cbVarHorizontal)
         self.cbVertical = Checkbutton(self, width=0, variable=self.cbVarVertical)
+        self.cbOuterOnly = Checkbutton(self, width=0, variable=self.cbVarOuter)
 
         self.borderList = OptionMenu(self, self.borderType)
 
@@ -63,7 +66,7 @@ class NewMorphLineWindow(Toplevel):
 
     def update_image(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()])
+        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()], self.cbVarOuter.get())
         self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
         self.master.manager.new_state(self.master.image.cv2Image)
         self.master.update_visible_image()
@@ -71,34 +74,42 @@ class NewMorphLineWindow(Toplevel):
         self.destroy()
 
     def update_preview(self, *args):
+        self.sizeHorizontalWSpin.config(from_=int(self.horizontalSizeH.get())+2)
+        self.sizeHorizontalHSpin.config(to=int(self.horizontalSizeW.get())-2)
+        self.sizeVerticalWSpin.config(from_=int(self.verticalSizeH.get())+2)
+        self.sizeVerticalHSpin.config(to=int(self.verticalSizeW.get())-2)
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()])
+        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()], self.cbVarOuter.get())
         self.master.update_visible_image()
         self.master.update_child_windows()
 
     def place_widgets(self):
         Label(self, text="Poziome linie", font=("Helvetica", 15)).place(x=90, y=5)
-        Label(self, text="Pionowe linie", font=("Helvetica", 15)).place(x=410, y=5)
+        Label(self, text="Pionowe linie", font=("Helvetica", 15)).place(x=400, y=5)
 
-        self.sizeHorizontalWSpin.place(width=100, height=50, x=130, y=60)
-        self.sizeHorizontalHSpin.place(width=100, height=50, x=130, y=120)
+        self.sizeHorizontalWSpin.place(width=100, height=50, x=150, y=60)
+        self.sizeHorizontalHSpin.place(width=100, height=50, x=150, y=120)
         self.sizeVerticalWSpin.place(width=100, height=50, x=450, y=60)
         self.sizeVerticalHSpin.place(width=100, height=50, x=450, y=120)
 
-        Label(self, text="Min. długość", font=("Helvetica", 15)).place(x=10, y=70)
-        Label(self, text="Min. grubość", font=("Helvetica", 15)).place(x=10, y=130)
+        Label(self, text="Min. długość", font=("Helvetica", 15)).place(x=30, y=70)
+        Label(self, text="Min. grubość", font=("Helvetica", 15)).place(x=30, y=130)
         Label(self, text="Min. długość", font=("Helvetica", 15)).place(x=330, y=70)
         Label(self, text="Min. grubość", font=("Helvetica", 15)).place(x=330, y=130)
 
-        Label(self, text="Szukać poziomych?", font=("Helvetica", 9)).place(x=10, y=175)
-        Label(self, text="Szukać pionowych?", font=("Helvetica", 9)).place(x=330, y=175)
+        Label(self, text="Szukać poziomych?", font=("Helvetica", 9)).place(x=70, y=175)
+        Label(self, text="Szukać pionowych?", font=("Helvetica", 9)).place(x=380, y=175)
 
-        self.cbHorizontal.place(x=130, y=175)
-        self.cbVertical.place(x=450, y=175)
-        self.borderList.place(width=200, height=50, x=200, y=200)
+        self.cbHorizontal.place(x=180, y=175)
+        self.cbVertical.place(x=500, y=175)
 
-        self.saveButton.place(width=40, height=40, x=220, y=255)
-        self.cancelButton.place(width=40, height=40, x=340, y=255)
+        Label(self, text="Szukać tylko zewnętrznych?", font=("Helvetica", 11)).place(x=190, y=225)
+        self.cbOuterOnly.place(x=390, y=225)
+
+        self.borderList.place(width=200, height=50, x=200, y=250)
+
+        self.saveButton.place(width=40, height=40, x=220, y=305)
+        self.cancelButton.place(width=40, height=40, x=340, y=305)
 
     def cancel(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)

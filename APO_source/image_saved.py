@@ -297,11 +297,12 @@ class ImageSaved():
         #self.cv2Image = cv2.subtract(thresh, img_gray)
         #self.cv2Image[markers2 == -1] = 0
 
-    def morph_line(self, horizontalW, horizontalH, veritcalW, verticalH,searchHorizontal, searchVertical, borderOption):
+    def morph_line(self, horizontalW, horizontalH, veritcalW, verticalH,searchHorizontal, searchVertical, borderOption, outerOnly):
         horizontal = np.zeros_like(self.cv2Image)
         vertical = np.zeros_like(self.cv2Image)
 
-        self.cv2Image = cv2.adaptiveThreshold(self.cv2Image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, -2)
+        if outerOnly:
+            self.cv2Image = cv2.adaptiveThreshold(self.cv2Image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 0)
 
         if searchHorizontal:
             horizontal = self.handle_line_extraction(horizontalW, horizontalH, borderOption)
