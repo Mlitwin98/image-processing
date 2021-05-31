@@ -39,7 +39,7 @@ class ImageSaved():
                                 bmp_b = bmp_w
                             else:
                                 bmp_b = int(bmp_s/bmp_h)
-                                
+
                             bmp.seek(offset, 0)
                             bmp_line = []
                             bmp_whole = []
@@ -176,7 +176,7 @@ class ImageSaved():
             newMin = newMini
 
         def calculate(oldPixel):
-            return int(((oldPixel-minImg) * newMax)/(maxImg-minImg))
+            return int(((oldPixel-minImg) * (newMax-newMin))/(maxImg-minImg))+newMin
 
         func = np.vectorize(calculate)
         self.cv2Image = np.where(np.logical_and(self.copy >= minImg, self.copy <= maxImg), func(self.cv2Image), self.copy) 

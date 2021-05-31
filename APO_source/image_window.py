@@ -103,6 +103,7 @@ class NewImageWindow(Toplevel):
         except AttributeError:
             ext = '.bmp'
         finally:
+            dir = ''
             dir = filedialog.asksaveasfilename(
             initialfile='*'+ext,
             defaultextension=ext, 
@@ -113,13 +114,15 @@ class NewImageWindow(Toplevel):
                 ('GIF', '*.gif'),
                 ]
             )
-            self.pathToImage = dir
-            self.name = os.path.split(dir)[1]
-            self.title(self.name)
-            try:
-                cv2.imwrite(dir, self.image.cv2Image)
-            except cv2.error:
-                messagebox.showerror("Błąd", "Nieoczekiwany błąd, sprawdź czy dobrze wprowadziłeś nazwę pliku")
+            if dir != '':
+                try:
+                    
+                    cv2.imwrite(dir, self.image.cv2Image)
+                    self.pathToImage = dir
+                    self.name = os.path.split(dir)[1]
+                    self.title(self.name)
+                except cv2.error:
+                    messagebox.showerror("Błąd", "Nieoczekiwany błąd, sprawdź czy dobrze wprowadziłeś nazwę pliku")
 
 
     def redo(self):
