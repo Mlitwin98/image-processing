@@ -39,8 +39,7 @@ class ImageSaved():
                                 bmp_b = bmp_w
                             else:
                                 bmp_b = int(bmp_s/bmp_h)
-
-
+                                
                             bmp.seek(offset, 0)
                             bmp_line = []
                             bmp_whole = []
@@ -48,7 +47,7 @@ class ImageSaved():
                                 for _ in range(bmp_b):
                                     bmp_byte = bmp.read(1)
                                     bmp_line.append((int.from_bytes(bmp_byte, 'little', signed=False)))
-                                bmp_whole.append(bmp_line[::jumpVal])
+                                bmp_whole.append(bmp_line[:bmp_w if jumpVal == 1 else len(bmp_line):jumpVal])
                                 bmp_line = []
 
                             bmp_whole.reverse()
@@ -435,7 +434,6 @@ class ImageSaved():
                 continue
             sampleMat = np.float32(feat_test[:,x].reshape(-1,1).transpose())
             response = mysvm.predict(sampleMat)[1]
-            print(response)
             if response == 1:
                 cv2.drawContours(self.cv2Image, [cnt], 0, (0,255,0), 3) # zielony = ryz
             elif response == 2:
