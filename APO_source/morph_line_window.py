@@ -12,8 +12,8 @@ class NewMorphLineWindow(Toplevel):
 
         
     def set_basic(self):
-        self.minsize(600, 350)
-        self.maxsize(600, 350)
+        self.minsize(600, 400)
+        self.maxsize(600, 400)
         self.title("Ekstrakcja linii")
         self.protocol("WM_DELETE_WINDOW", lambda: self.cancel())
 
@@ -47,10 +47,12 @@ class NewMorphLineWindow(Toplevel):
         self.cbVarHorizontal.trace("w", self.update_preview)
         self.cbVarVertical.trace("w", self.update_preview)
         self.cbVarOuter.trace("w", self.update_preview)
+        self.cbVarNegate.trace("w", self.update_preview)
         
         self.cbHorizontal = Checkbutton(self, width=0, variable=self.cbVarHorizontal)
         self.cbVertical = Checkbutton(self, width=0, variable=self.cbVarVertical)
         self.cbOuterOnly = Checkbutton(self, width=0, variable=self.cbVarOuter)
+        self.cbNegateFirst = Checkbutton(self, width=0, variable=self.cbVarNegate)
 
         self.borderList = OptionMenu(self, self.borderType)
 
@@ -66,7 +68,7 @@ class NewMorphLineWindow(Toplevel):
 
     def update_image(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()], self.cbVarOuter.get())
+        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()], self.cbVarOuter.get(), self.cbVarNegate.get())
         self.master.image.copy = copy.deepcopy(self.master.image.cv2Image)
         self.master.manager.new_state(self.master.image.cv2Image)
         self.master.update_visible_image()
@@ -79,13 +81,13 @@ class NewMorphLineWindow(Toplevel):
         self.sizeVerticalWSpin.config(from_=int(self.verticalSizeH.get())+2)
         self.sizeVerticalHSpin.config(to=int(self.verticalSizeW.get())-2)
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)
-        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()], self.cbVarOuter.get())
+        self.master.image.morph_line(int(self.horizontalSizeW.get()), int(self.horizontalSizeH.get()), int(self.verticalSizeW.get()), int(self.verticalSizeH.get()), self.cbVarHorizontal.get(), self.cbVarVertical.get(), self.handleBorder[self.borderType.get()], self.cbVarOuter.get(), self.cbVarNegate.get())
         self.master.update_visible_image()
         self.master.update_child_windows()
 
     def place_widgets(self):
-        Label(self, text="Poziome linie", font=("Helvetica", 15)).place(x=90, y=5)
-        Label(self, text="Pionowe linie", font=("Helvetica", 15)).place(x=400, y=5)
+        Label(self, text="Poziome linie", font=("Helvetica", 15)).place(x=85, y=15)
+        Label(self, text="Pionowe linie", font=("Helvetica", 15)).place(x=395, y=15)
 
         self.sizeHorizontalWSpin.place(width=100, height=50, x=150, y=60)
         self.sizeHorizontalHSpin.place(width=100, height=50, x=150, y=120)
@@ -104,12 +106,13 @@ class NewMorphLineWindow(Toplevel):
         self.cbVertical.place(x=500, y=175)
 
         Label(self, text="Szukać tylko zewnętrznych?", font=("Helvetica", 11)).place(x=190, y=225)
+        Label(self, text="Wstępnie zanegować?", font=("Helvetica", 11)).place(x=190, y=255)
         self.cbOuterOnly.place(x=390, y=225)
+        self.cbNegateFirst.place(x=390, y=255)
+        self.borderList.place(width=200, height=50, x=200, y=300)
 
-        self.borderList.place(width=200, height=50, x=200, y=250)
-
-        self.saveButton.place(width=40, height=40, x=220, y=305)
-        self.cancelButton.place(width=40, height=40, x=340, y=305)
+        self.saveButton.place(width=40, height=40, x=220, y=355)
+        self.cancelButton.place(width=40, height=40, x=340, y=355)
 
     def cancel(self):
         self.master.image.cv2Image = copy.deepcopy(self.master.image.copy)

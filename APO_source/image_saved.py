@@ -297,9 +297,13 @@ class ImageSaved():
         #self.cv2Image = cv2.subtract(thresh, img_gray)
         #self.cv2Image[markers2 == -1] = 0
 
-    def morph_line(self, horizontalW, horizontalH, veritcalW, verticalH,searchHorizontal, searchVertical, borderOption, outerOnly):
+    # --------- PROJEKT ---------------
+    def morph_line(self, horizontalW, horizontalH, veritcalW, verticalH,searchHorizontal, searchVertical, borderOption, outerOnly, negateFirst):
         horizontal = np.zeros_like(self.cv2Image)
         vertical = np.zeros_like(self.cv2Image)
+
+        if negateFirst:
+            self.cv2Image = cv2.bitwise_not(self.cv2Image)
 
         if outerOnly:
             self.cv2Image = cv2.adaptiveThreshold(self.cv2Image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 15, 0)
@@ -317,6 +321,7 @@ class ImageSaved():
         outputElement = cv2.getStructuringElement(cv2.MORPH_RECT, (width, height))
         output = cv2.erode(output, outputElement, borderType=borderOption)
         return cv2.dilate(output, outputElement, borderType=borderOption)
+    # --------------------------------
 
     def get_objects_vector(self):
         self.cv2Image = self.copy
